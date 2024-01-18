@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import DataTable from "react-data-table-component";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import UseDeleteTemplate from "@/hooks/UseDeleteTemplate";
 import { PATH } from "@/constants/path";
 import UseGetTemplate from "@/hooks/UseGetTemplate";
@@ -36,10 +36,9 @@ const TemplateListForm = () => {
   const [sortField, setSortField] = useState(""); // To store the currently sorted column
   const [sortOrder, setSortOrder] = useState("desc"); // To store the sorting order (asc or desc)
 
-  const fetchData = useCallback(async () => {
+  const fetchData = async () => {
     try {
       // Handle other data values as needed
-
       const getData =
         "?currentPage=" +
         currentPage +
@@ -57,13 +56,30 @@ const TemplateListForm = () => {
     } catch (error) {
       console.error("Error fetching data:", error);
     }
-  }, [currentPage, pageSize, sortField, sortOrder]);
+  };
 
   useEffect(() => {
-    if (totalPages !== 1) {
-      fetchData();
+    try {
+      // Handle other data values as needed
+      const getData =
+        "?currentPage=" +
+        currentPage +
+        "&&pageSize=" +
+        pageSize +
+        "&&sortField=" +
+        sortField +
+        "&&sortOrder=" +
+        sortOrder;
+      UseGetTemplate(getData).then((result) => {
+        setTemplateList(result.data.data.result);
+        setCurrentPage(result.data.data.currentPage);
+        setTotalPages(result.data.data.totalPages);
+        setPageSize(result.data.data.pageSize);
+      });
+    } catch (error) {
+      console.error("Error fetching data:", error);
     }
-  }, [totalPages, currentPage, pageSize, sortField, sortOrder, fetchData]);
+  }, [totalPages, currentPage, pageSize, sortField, sortOrder]);
   const columnsName = [
     { label: "Template Name", value: "template_name" },
     { label: "Category Name", value: "category_name" },

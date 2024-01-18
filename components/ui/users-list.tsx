@@ -35,10 +35,17 @@ const UserListForm = () => {
     }
   };
   useEffect(() => {
-    if (currentPage !== 1 || pageSize !== 10) {
-      fetchData();
+    try {
+      // Handle other data values as needed
+
+      UseGetUsers().then((result) => {
+        setuserList(result.data.data);
+        setTotalPages(result.data.totalPages);
+      });
+    } catch (error) {
+      console.error("Error fetching data:", error);
     }
-  }, [currentPage, pageSize, fetchData]);
+  }, [currentPage, pageSize]);
   const columns = [
     {
       name: "User Name",

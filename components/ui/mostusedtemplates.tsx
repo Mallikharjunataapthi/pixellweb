@@ -33,8 +33,29 @@ const MostUsedTemplatesList = () => {
   const [sortField, setSortField] = useState(""); // To store the currently sorted column
   const [sortOrder, setSortOrder] = useState("desc"); // To store the sorting order (asc or desc)
   useEffect(() => {
-    if (totalPages !== 1) {
-      fetchData();
+    try {
+      // Handle other data values as needed
+
+      const getData =
+        "?currentPage=" +
+        currentPage +
+        "&&pageSize=" +
+        pageSize +
+        "&&sortField=" +
+        sortField +
+        "&&sortOrder=" +
+        sortOrder;
+      const url = getEndpointUrl(
+        ENDPOINTS.adminreport + ENDPOINTS.mostusedtemplates + getData,
+      );
+      UseGetReports(url).then((result) => {
+        setMostActiveUsersList(result?.data?.result?.data?.result);
+        setCurrentPage(result?.data?.result?.data?.currentPage);
+        setTotalPages(result?.data?.result?.data?.totalPages);
+        setPageSize(result?.data?.result?.data?.pageSize);
+      });
+    } catch (error) {
+      console.error("Error fetching data:", error);
     }
   }, [currentPage, pageSize, sortOrder, sortField]);
   const fetchData = async () => {

@@ -62,10 +62,27 @@ const TemplateFeedbackListForm = () => {
     }
   };
   useEffect(() => {
-    if (totalPages !== 1) {
-      fetchData();
+    try {
+      // Handle other data values as needed
+      const getData =
+        "?currentPage=" +
+        currentPage +
+        "&&pageSize=" +
+        pageSize +
+        "&&sortField=" +
+        sortField +
+        "&&sortOrder=" +
+        sortOrder;
+      UseGetTemplateFeedback(getData).then((result) => {
+        setTemplateList(result.data.data.data);
+        setCurrentPage(result.data.data.currentPage);
+        setTotalPages(result.data.data.totalPages);
+        setPageSize(result.data.data.pageSize);
+      });
+    } catch (error) {
+      console.error("Error fetching data:", error);
     }
-  }, [totalPages, currentPage, pageSize, sortOrder, sortField, fetchData]);
+  }, [totalPages, currentPage, pageSize, sortOrder, sortField]);
   const columnsName = [
     { label: "Template Name", value: "template_name" },
     { label: "User Name", value: "username" },
