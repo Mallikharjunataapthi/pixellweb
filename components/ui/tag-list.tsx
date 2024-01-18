@@ -33,7 +33,6 @@ const TagListForm = () => {
   const [sortOrder, setSortOrder] = useState("desc"); // To store the sorting order (asc or desc)
 
   useEffect(() => {
-    if (totalPages !== 1) {
       try {
         // Handle other data values as needed
         const getData =
@@ -54,7 +53,6 @@ const TagListForm = () => {
       } catch (error) {
         console.error("Error fetching data:", error);
       }
-    }
   }, [totalPages, currentPage, pageSize, sortOrder, sortField]);
   const columnsName = [
     { label: "Name", value: "tag_name" },
