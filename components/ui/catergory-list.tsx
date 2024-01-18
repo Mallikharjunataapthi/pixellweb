@@ -55,12 +55,10 @@ const CategoryListForm = () => {
     } catch (error) {
       console.error("Error fetching data:", error);
     }
-  }, [currentPage, pageSize, sortOrder, sortField]);
+  }, [currentPage, pageSize]);
   useEffect(() => {
-    if (totalPages !== 1) {
-      fetchData();
-    }
-  }, [totalPages, currentPage, pageSize, sortOrder, sortField]);
+    fetchData();
+  }, [currentPage, pageSize, fetchData]);
   const columnsName = [
     { label: "Name", value: "cat_name" },
     { label: "Status", value: "is_active" },
