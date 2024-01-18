@@ -33,26 +33,26 @@ const TagListForm = () => {
   const [sortOrder, setSortOrder] = useState("desc"); // To store the sorting order (asc or desc)
 
   useEffect(() => {
-      try {
-        // Handle other data values as needed
-        const getData =
-          "?currentPage=" +
-          currentPage +
-          "&&pageSize=" +
-          pageSize +
-          "&&sortField=" +
-          sortField +
-          "&&sortOrder=" +
-          sortOrder;
-        UseGetTag(getData).then((result) => {
-          setTagList(result?.data?.data?.result);
-          setCurrentPage(result?.data?.data?.currentPage);
-          setTotalPages(result?.data?.data?.totalPages);
-          setPageSize(result?.data?.data?.pageSize);
-        });
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
+    try {
+      // Handle other data values as needed
+      const getData =
+        "?currentPage=" +
+        currentPage +
+        "&&pageSize=" +
+        pageSize +
+        "&&sortField=" +
+        sortField +
+        "&&sortOrder=" +
+        sortOrder;
+      UseGetTag(getData).then((result) => {
+        setTagList(result?.data?.data?.result);
+        setCurrentPage(result?.data?.data?.currentPage);
+        setTotalPages(result?.data?.data?.totalPages);
+        setPageSize(result?.data?.data?.pageSize);
+      });
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
   }, [totalPages, currentPage, pageSize, sortOrder, sortField]);
   const columnsName = [
     { label: "Name", value: "tag_name" },
