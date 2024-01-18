@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import DataTable from "react-data-table-component";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import UseGetCategory from "@/hooks/UseGetCategory";
 import UseDeleteCategory from "@/hooks/UseDeleteCategory";
 import { PATH } from "@/constants/path";
@@ -30,23 +30,14 @@ const CategoryListForm = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  const [sortField, setSortField] = useState(""); // To store the currently sorted column
-  const [sortOrder, setSortOrder] = useState("desc"); // To store the sorting order (asc or desc)
-  const fetchData = useCallback(async () => {
+
+  useEffect(() => {
     try {
       // Handle other data values as needed
 
-      const getData =
-        "?currentPage=" +
-        currentPage +
-        "&&pageSize=" +
-        pageSize +
-        "&&sortField=" +
-        sortField +
-        "&&sortOrder=" +
-        sortOrder;
+      const getData ="?currentPage=" + currentPage + "&&pageSize=" + pageSize;
       const url = getEndpointUrl(ENDPOINTS.category + getData);
-      await UseGetCategory(url).then((result) => {
+      UseGetCategory(url).then((result) => {
         setCategoryList(result?.data?.result?.data?.result);
         setCurrentPage(result?.data?.result?.data?.currentPage);
         setTotalPages(result?.data?.result?.data?.totalPages);
@@ -56,9 +47,6 @@ const CategoryListForm = () => {
       console.error("Error fetching data:", error);
     }
   }, [currentPage, pageSize]);
-  useEffect(() => {
-    fetchData();
-  }, [currentPage, pageSize, fetchData]);
   const columnsName = [
     { label: "Name", value: "cat_name" },
     { label: "Status", value: "is_active" },
@@ -106,8 +94,6 @@ const CategoryListForm = () => {
         (item: Category) => item._id !== cateogryId,
       );
       setCategoryList([...updatedItems]);
-
-      fetchData();
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -121,7 +107,6 @@ const CategoryListForm = () => {
     // Update the rows per page and current page
     page;
     setPageSize(newPerPage);
-    fetchData();
   };
   const CustomPagination = ({
     pages,
@@ -137,8 +122,8 @@ const CategoryListForm = () => {
     const colname: string = column.name || "";
     const colfield = columnsName.find((col) => col?.label === colname);
     const colvalue: string = colfield ? colfield?.value : "";
-    setSortField(colvalue);
-    setSortOrder(sortDirection);
+    colvalue;
+    sortDirection;
   };
   const breadcrumbItems = [
     {
