@@ -3,11 +3,7 @@ import Link from "next/link";
 import { ExternalLink } from "lucide-react";
 import { ReactNode } from "react";
 import { PATH } from "@/constants/path";
-import { useUserContext } from "@/context/store";
-
 const Sidebar = () => {
-  const { user } = useUserContext();
-
   const topMenu = {
     title: "My Profile",
     items: [
@@ -23,7 +19,7 @@ const Sidebar = () => {
             <ExternalLink className="w-[1.1rem]" />
           </div>
         ),
-        href: PATH.SUBSCRIPTION.path(user?.email),
+        href: PATH.SUBSCRIPTION.path("test"),
         hasExternalLink: true,
       },
     ],

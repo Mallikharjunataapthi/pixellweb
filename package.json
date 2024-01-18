@@ -26,7 +26,6 @@
     "copy-webpack-plugin": "^11.0.0",
     "datatables.net": "^1.13.8",
     "encoding": "^0.1.13",
-    "firebase": "^10.5.0",
     "iniparser": "^1.0.5",
     "js-cookie": "^3.0.5",
     "lucide-react": "^0.292.0",
