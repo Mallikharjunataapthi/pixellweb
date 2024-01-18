@@ -60,7 +60,7 @@ const CategoryListForm = () => {
     if (totalPages !== 1) {
       fetchData();
     }
-  }, [totalPages, currentPage, pageSize, sortOrder, sortField, fetchData]);
+  }, [totalPages, currentPage, pageSize, sortOrder, sortField]);
   const columnsName = [
     { label: "Name", value: "cat_name" },
     { label: "Status", value: "is_active" },

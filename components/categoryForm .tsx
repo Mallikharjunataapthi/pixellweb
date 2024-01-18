@@ -30,26 +30,28 @@ const CategoryForm = (props: { id: number }) => {
   } = useForm();
 
   const fetchData = async () => {
-    try {
-      const categoryDetails = await UseGetCategoryById(catid);
-      if (
-        categoryDetails.data.data != undefined &&
-        categoryDetails.data.data != null
-      ) {
-        setCat_name(categoryDetails.data.data.cat_name);
-        setis_active(categoryDetails.data.data.is_active);
-        setis_FormUpdate(true);
-        const initialFormValues: { [key: string]: string } = {
-          cat_name: categoryDetails.data.data.cat_name,
-          is_active: categoryDetails.data.data.is_active,
-        };
-        Object.keys(initialFormValues).forEach((key) => {
-          register(key); // Register the field if not already registered
-          setValue(key, initialFormValues[key]); // Set the initial value
-        });
+    if (catid != 0) {
+      try {
+        const categoryDetails = await UseGetCategoryById(catid);
+        if (
+          categoryDetails.data.data != undefined &&
+          categoryDetails.data.data != null
+        ) {
+          setCat_name(categoryDetails.data.data.cat_name);
+          setis_active(categoryDetails.data.data.is_active);
+          setis_FormUpdate(true);
+          const initialFormValues: { [key: string]: string } = {
+            cat_name: categoryDetails.data.data.cat_name,
+            is_active: categoryDetails.data.data.is_active,
+          };
+          Object.keys(initialFormValues).forEach((key) => {
+            register(key); // Register the field if not already registered
+            setValue(key, initialFormValues[key]); // Set the initial value
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
       }
-    } catch (error) {
-      console.error("Error fetching data:", error);
     }
   };
   useEffect(() => {
