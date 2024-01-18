@@ -1,0 +1,18 @@
+{
+  "projects": {
+    "default": "bubbly-sandbox-403616"
+  },
+  "targets": {
+    "bubbly-sandbox-403616": {
+      "hosting": {
+        "xds-dev": [
+          "bubbly-sandbox-403616"
+        ],
+        "xds-prod": [
+          "xds-spark-ff9ef"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}
