@@ -9,5 +9,5 @@ app:
     ports:
       - "3000:3800"
     volumes:
-      - .:/app/web
-      - /app/web/node_modules
+      - .:/pixellweb
+      - /pixellweb/node_modules

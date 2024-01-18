@@ -18,10 +18,5 @@ const nextConfig = {
       },
     ],
   },
-  exportPathMap: async function () {
-    return {
-      '/': { page: '/admin' }, // Set '/customhome' as the default home page
-    };
-  },
 };
 module.exports = nextConfig;
