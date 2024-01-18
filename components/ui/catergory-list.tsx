@@ -35,7 +35,7 @@ const CategoryListForm = () => {
     try {
       // Handle other data values as needed
 
-      const getData ="?currentPage=" + currentPage + "&&pageSize=" + pageSize;
+      const getData = "?currentPage=" + currentPage + "&&pageSize=" + pageSize;
       const url = getEndpointUrl(ENDPOINTS.category + getData);
       UseGetCategory(url).then((result) => {
         setCategoryList(result?.data?.result?.data?.result);

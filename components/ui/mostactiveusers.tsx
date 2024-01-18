@@ -33,8 +33,37 @@ const MostActiveUsersList = () => {
   const [fromDatestring, setFromDatestring] = useState<Date | null>(null); // Specify the type
   const [toDateString, setToDatetring] = useState<Date | null>(null); //
   useEffect(() => {
-    if (totalPages !== 1 || fromDatestring != null) {
-      fetchData();
+    if (fromDatestring != null) {
+      try {
+        // Handle other data values as needed
+        const getData =
+          "?currentPage=" +
+          currentPage +
+          "&&pageSize=" +
+          pageSize +
+          "&&sortField=" +
+          sortField +
+          "&&sortOrder=" +
+          sortOrder +
+          (fromDatestring
+            ? "&&fromDatestring=" + fromDatestring.toISOString().split("T")[0]
+            : "") +
+          (fromDatestring && toDateString
+            ? "&&toDateString=" + toDateString.toISOString().split("T")[0]
+            : "");
+        const url = getEndpointUrl(
+          ENDPOINTS.adminreport + ENDPOINTS.mostactiveusers + getData,
+        );
+        // Append string data to the dateSearchData object
+        UseGetReports(url).then((result) => {
+          setMostActiveUsersList(result?.data?.result?.data?.result);
+          setCurrentPage(result?.data?.result?.data?.currentPage);
+          setTotalPages(result?.data?.result?.data?.totalPages);
+          setPageSize(result?.data?.result?.data?.pageSize);
+        });
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
     }
   }, [
     currentPage,
@@ -44,39 +73,7 @@ const MostActiveUsersList = () => {
     fromDatestring,
     toDateString,
   ]);
-  const fetchData = async () => {
-    try {
-      // Handle other data values as needed
 
-      const getData =
-        "?currentPage=" +
-        currentPage +
-        "&&pageSize=" +
-        pageSize +
-        "&&sortField=" +
-        sortField +
-        "&&sortOrder=" +
-        sortOrder +
-        (fromDatestring
-          ? "&&fromDatestring=" + fromDatestring.toISOString().split("T")[0]
-          : "") +
-        (fromDatestring && toDateString
-          ? "&&toDateString=" + toDateString.toISOString().split("T")[0]
-          : "");
-      const url = getEndpointUrl(
-        ENDPOINTS.adminreport + ENDPOINTS.mostactiveusers + getData,
-      );
-      // Append string data to the dateSearchData object
-      await UseGetReports(url).then((result) => {
-        setMostActiveUsersList(result?.data?.result?.data?.result);
-        setCurrentPage(result?.data?.result?.data?.currentPage);
-        setTotalPages(result?.data?.result?.data?.totalPages);
-        setPageSize(result?.data?.result?.data?.pageSize);
-      });
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
   const columnsName = [
     { label: "User Name", value: "userName" },
     { label: "Used Count", value: "userCount" },
@@ -113,7 +110,6 @@ const MostActiveUsersList = () => {
     // Update the rows per page and current page
     page;
     setPageSize(newPerPage);
-    fetchData();
   };
   const CustomPagination = ({
     pages,

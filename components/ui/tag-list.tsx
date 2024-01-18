@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import DataTable from "react-data-table-component";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import UseGetTag from "@/hooks/UseGetTag";
 import UseDeleteTag from "@/hooks/UseDeleteTag";
 import { PATH } from "@/constants/path";
@@ -32,33 +32,30 @@ const TagListForm = () => {
   const [sortField, setSortField] = useState(""); // To store the currently sorted column
   const [sortOrder, setSortOrder] = useState("desc"); // To store the sorting order (asc or desc)
 
-  const fetchData = useCallback(async () => {
-    try {
-      // Handle other data values as needed
-      const getData =
-        "?currentPage=" +
-        currentPage +
-        "&&pageSize=" +
-        pageSize +
-        "&&sortField=" +
-        sortField +
-        "&&sortOrder=" +
-        sortOrder;
-      await UseGetTag(getData).then((result) => {
-        setTagList(result?.data?.data?.result);
-        setCurrentPage(result?.data?.data?.currentPage);
-        setTotalPages(result?.data?.data?.totalPages);
-        setPageSize(result?.data?.data?.pageSize);
-      });
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  }, [currentPage, pageSize, sortOrder, sortField]);
   useEffect(() => {
     if (totalPages !== 1) {
-      fetchData();
+      try {
+        // Handle other data values as needed
+        const getData =
+          "?currentPage=" +
+          currentPage +
+          "&&pageSize=" +
+          pageSize +
+          "&&sortField=" +
+          sortField +
+          "&&sortOrder=" +
+          sortOrder;
+        UseGetTag(getData).then((result) => {
+          setTagList(result?.data?.data?.result);
+          setCurrentPage(result?.data?.data?.currentPage);
+          setTotalPages(result?.data?.data?.totalPages);
+          setPageSize(result?.data?.data?.pageSize);
+        });
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
     }
-  }, [totalPages, currentPage, pageSize, sortOrder, sortField, fetchData]);
+  }, [totalPages, currentPage, pageSize, sortOrder, sortField]);
   const columnsName = [
     { label: "Name", value: "tag_name" },
     { label: "Status", value: "is_active" },
@@ -103,8 +100,6 @@ const TagListForm = () => {
       await UseDeleteTag(tagId);
       const updatedItems = tagList.filter((item: Tag) => item._id !== tagId);
       setTagList([...updatedItems]);
-
-      fetchData();
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -118,7 +113,6 @@ const TagListForm = () => {
     // Update the rows per page and current page
     page;
     setPageSize(newPerPage);
-    fetchData();
   };
   const CustomPagination = ({
     pages,
