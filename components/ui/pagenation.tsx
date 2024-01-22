@@ -21,7 +21,7 @@ const Pagination: React.FC<PaginationProps> = ({ page, pages, onClick }) => {
 
   return (
     <div className="text-center pb-6">
-      {pages > 1 ? (
+      {pages > 4 ? (
         <button
           className="bg-blue-500 rounded-sm text-white py-2 px-2 mr-3"
           onClick={() => onClick(1)}
@@ -32,7 +32,7 @@ const Pagination: React.FC<PaginationProps> = ({ page, pages, onClick }) => {
       ) : (
         ""
       )}
-      {pages > 4 ? (
+      {pages > 1 ? (
         <button
           className="bg-blue-500 rounded-sm text-white py-2 px-2 mr-3"
           onClick={() => onClick(page - 1)}
