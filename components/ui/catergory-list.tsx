@@ -61,8 +61,8 @@ const CategoryListForm = () => {
   const columns = [
     {
       name: "App Name",
-      selector: (row: Category) => row?.app_id.app_name || "",
-      cell: (row: Category) => row?.app_id.app_name || "",
+      selector: (row: Category) => row?.app_id?.app_name || "",
+      cell: (row: Category) => row?.app_id?.app_name || "",
       sortable: true,
     },
     {
