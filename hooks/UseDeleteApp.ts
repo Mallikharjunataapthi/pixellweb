@@ -1,17 +1,17 @@
 import { getEndpointUrl, ENDPOINTS } from "@/constants/endpoints";
 import axios from "axios";
 import Cookies from "js-cookie";
-
-const UseGetUsers = async (url: string) => {
+const UseDeleteApp = async (appId: string) => {
+  const admintoken = Cookies.get("admintoken");
+  const url = getEndpointUrl(ENDPOINTS.apps + "/" + appId);
   try {
-    const admintoken = Cookies.get("admintoken");
-
-    const response = await axios.get(url, {
+    const response = await axios.delete(url, {
       headers: {
         Authorization: `Bearer ${admintoken}`,
         // Add any other headers if needed
       },
     });
+
     return response;
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -26,4 +26,4 @@ const UseGetUsers = async (url: string) => {
     }
   }
 };
-export default UseGetUsers;
+export default UseDeleteApp;

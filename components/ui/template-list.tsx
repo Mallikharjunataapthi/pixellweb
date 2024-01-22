@@ -11,6 +11,8 @@ import Pagination from "./pagenation";
 import { redirect } from "next/navigation";
 import { useAdminContext } from "@/context/storeAdmin";
 import Breadcrumbs from "@/components/breadcrumb";
+import { Button, Modal } from "flowbite-react";
+import { HiOutlineExclamationCircle } from "react-icons/hi";
 interface Template {
   _id: string;
   template_name: string;
@@ -18,6 +20,7 @@ interface Template {
   is_free: string;
   is_approved: string;
   is_active: number;
+  app_id: { app_name: string; _id: number };
 }
 interface TableColumn {
   label: string;
@@ -35,7 +38,10 @@ const TemplateListForm = () => {
   const [pageSize, setPageSize] = useState(10);
   const [sortField, setSortField] = useState(""); // To store the currently sorted column
   const [sortOrder, setSortOrder] = useState("desc"); // To store the sorting order (asc or desc)
-
+  const [openModal, setOpenModal] = useState(false);
+  const [templateId, setTemplateId] = useState("");
+  const [templateactionurl, setTemplateactionurl] = useState("");
+  const [actiontype, setActionType] = useState("");
   const fetchData = async () => {
     try {
       // Handle other data values as needed
@@ -89,12 +95,21 @@ const TemplateListForm = () => {
   ];
   const columns = [
     {
+      name: "App Name",
+      selector: (row: Template) => row?.app_id?.app_name,
+      sortable: true,
+    },
+    {
+      name: "Category Name",
+      selector: (row: Template) => row.category_name,
+      sortable: true,
+    },
+    {
       name: "Template Name",
       selector: (row: Template) => row.template_name,
       sortable: true,
       cell: (row: Template) => (
         <Link
-          style={{ width: "50px" }}
           className="text-blue-300 hover:text-red block text-sm"
           href={"template/" + row._id}
         >
@@ -102,12 +117,6 @@ const TemplateListForm = () => {
         </Link>
       ),
     },
-    {
-      name: "Category Name",
-      selector: (row: Template) => row.category_name,
-      sortable: true,
-    },
-
     {
       name: "Is Free",
       selector: (row: Template) => row.is_free,
@@ -131,7 +140,11 @@ const TemplateListForm = () => {
           <div>
             <button
               className="bg-red-700 rounded-sm text-white py-.8 px-1 text-sm m-1"
-              onClick={() => deleteTemplate(row._id)}
+              onClick={() => {
+                setOpenModal(true);
+                setTemplateId(row._id);
+                setActionType("Delete");
+              }}
             >
               Delete
             </button>
@@ -140,33 +153,41 @@ const TemplateListForm = () => {
           <div style={{ width: 400 }}>
             <button
               className="bg-gray-700 rounded-sm text-white py-.8 px-1 text-sm m-1"
-              onClick={() =>
-                ActionTemplate(
+              onClick={() => {
+                setTemplateactionurl(
                   getEndpointUrl(
-                    ENDPOINTS.templates + ENDPOINTS.declinetemplate(),
+                    ENDPOINTS.templates + ENDPOINTS.approvetemplate(),
                   ),
-                  row._id,
-                )
-              }
+                );
+                setTemplateId(row._id);
+                setOpenModal(true);
+                setActionType("Decline");
+              }}
             >
               Decline
             </button>
             <button
               className="bg-green-700 rounded-sm text-white py-.8 px-1 text-sm m-1"
-              onClick={() =>
-                ActionTemplate(
+              onClick={() => {
+                setTemplateactionurl(
                   getEndpointUrl(
                     ENDPOINTS.templates + ENDPOINTS.approvetemplate(),
                   ),
-                  row._id,
-                )
-              }
+                );
+                setTemplateId(row._id);
+                setOpenModal(true);
+                setActionType("Approved");
+              }}
             >
               Approved
             </button>
             <button
               className="bg-red-700 rounded-sm text-white py-.8 px-1 text-sm m-1"
-              onClick={() => deleteTemplate(row._id)}
+              onClick={() => {
+                setOpenModal(true);
+                setTemplateId(row._id);
+                setActionType("Delete");
+              }}
             >
               Delete
             </button>
@@ -174,25 +195,33 @@ const TemplateListForm = () => {
         ),
     },
   ];
-  async function ActionTemplate(url: string, id: string) {
+  async function ActionTemplate() {
     try {
       // Handle other data values as needed
-      await UseActionTemplate(url, { template_id: id });
+      await UseActionTemplate(templateactionurl, { template_id: templateId });
       fetchData();
     } catch (error) {
       console.error("Error fetching data:", error);
     }
+    setTemplateId("");
+    setTemplateactionurl("");
+    setActionType("");
   }
-  async function deleteTemplate(templateId: string) {
-    try {
-      // Handle other data values as needed
-      await UseDeleteTemplate(templateId);
-      const updatedItems = templateList.filter(
-        (item: Template) => item._id !== templateId,
-      );
-      setTemplateList([...updatedItems]);
 
-      fetchData();
+  async function deleteTemplate() {
+    try {
+      if (templateId != "") {
+        // Handle other data values as needed
+        await UseDeleteTemplate(templateId);
+        const updatedItems = templateList.filter(
+          (item: Template) => item._id !== templateId,
+        );
+        setTemplateList([...updatedItems]);
+        fetchData();
+      }
+      setTemplateId("");
+      setTemplateactionurl("");
+      setActionType("");
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -247,7 +276,6 @@ const TemplateListForm = () => {
             </div>
             <div className="mt-4 flex flex-col gap-4 sm:mt-0 sm:flex-row sm:items-start">
               <Link href={PATH.AddTemplate.path}>
-                {" "}
                 <button
                   className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-gray-200 px-5 py-2 text-blue-300 transition hover:bg-gray-50 hover:text-blue-400 focus:outline-none"
                   type="button"
@@ -283,6 +311,49 @@ const TemplateListForm = () => {
           />
         </div>
       </div>
+      <Modal
+        show={openModal}
+        size="sm"
+        onClose={() => {
+          setOpenModal(false);
+          setTemplateId("");
+          setTemplateactionurl("");
+          setActionType("");
+        }}
+        popup
+      >
+        <Modal.Header />
+        <Modal.Body>
+          <div className="text-center">
+            <HiOutlineExclamationCircle className="mx-auto mb-4 h-14 w-14 text-gray-400 dark:text-gray-200" />
+            <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
+              Are you sure you want to {actiontype} this Template?
+            </h3>
+            <div className="flex justify-center gap-4">
+              <Button
+                color="failure"
+                onClick={() => {
+                  setOpenModal(false);
+                  actiontype == "Delete" ? deleteTemplate() : ActionTemplate();
+                }}
+              >
+                {"Yes, I'm sure"}
+              </Button>
+              <Button
+                color="gray"
+                onClick={() => {
+                  setOpenModal(false);
+                  setTemplateId("");
+                  setTemplateactionurl("");
+                  setActionType("");
+                }}
+              >
+                No, cancel
+              </Button>
+            </div>
+          </div>
+        </Modal.Body>
+      </Modal>
     </>
   );
 };

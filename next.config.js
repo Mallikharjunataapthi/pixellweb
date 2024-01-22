@@ -22,11 +22,11 @@ const nextConfig = {
     return [
       // Basic redirect
       {
-        source: '/',
-        destination: '/admin',
+        source: "/",
+        destination: "/admin",
         permanent: true,
       },
-    ]
+    ];
   },
 };
 module.exports = nextConfig;

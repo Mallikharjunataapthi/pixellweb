@@ -19,13 +19,7 @@ const UseFormAdminRegister = <T>({
   const submitForm = async (data: T): Promise<void> => {
     setIsLoading(true);
     setError("");
-    const formData = data as { password: string; confirm_password: string };
-    if (formData.password !== formData.confirm_password) {
-      console.error("Error: Passwords do not match");
-      setError("Passwords do not match");
-      setIsLoading(false);
-      return;
-    }
+
     try {
       await axios.post(url, data);
       setSuccess(true);

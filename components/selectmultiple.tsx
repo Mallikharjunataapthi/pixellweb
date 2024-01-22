@@ -27,6 +27,7 @@ const Selectmultiple: FC<SelectmultipleProps> = ({
   setValue,
   ...props
 }) => {
+  !tagsOption ? setValue(id, null) : "";
   return (
     <>
       <Label htmlFor={id} className="font-bold text-xs">

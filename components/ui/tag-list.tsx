@@ -10,10 +10,13 @@ import Pagination from "./pagenation";
 import { useAdminContext } from "@/context/storeAdmin";
 import { redirect } from "next/navigation";
 import Breadcrumbs from "@/components/breadcrumb";
+import { Button, Modal } from "flowbite-react";
+import { HiOutlineExclamationCircle } from "react-icons/hi";
 interface Tag {
   _id: string;
   tag_name: string;
   is_active: number;
+  app_id: { app_name: string; _id: number };
 }
 interface TableColumn {
   label: string;
@@ -31,6 +34,8 @@ const TagListForm = () => {
   const [pageSize, setPageSize] = useState(10);
   const [sortField, setSortField] = useState(""); // To store the currently sorted column
   const [sortOrder, setSortOrder] = useState("desc"); // To store the sorting order (asc or desc)
+  const [openModal, setOpenModal] = useState(false);
+  const [deleteTagId, setDeleteTagId] = useState("");
 
   const fetchData = async () => {
     try {
@@ -83,12 +88,16 @@ const TagListForm = () => {
 
   const columns = [
     {
+      name: "App Name",
+      selector: (row: Tag) => row?.app_id?.app_name,
+      sortable: true,
+    },
+    {
       name: "Name",
       selector: (row: Tag) => row?.tag_name || "",
 
       cell: (row: Tag) => (
         <Link
-          style={{ width: "50px" }}
           className="text-blue-300 hover:text-red block text-sm"
           href={"tag/" + row._id}
         >
@@ -107,21 +116,29 @@ const TagListForm = () => {
       cell: (row: Tag) => (
         <button
           className="bg-red-700 rounded-sm text-white py-.8 px-1 text-sm"
-          onClick={() => deleteTag(row._id)}
+          onClick={() => {
+            setOpenModal(true);
+            setDeleteTagId(row._id);
+          }}
         >
           Delete
         </button>
       ),
     },
   ];
-  async function deleteTag(tagId: string) {
+  async function deleteTag() {
     try {
-      // Handle other data values as needed
-      await UseDeleteTag(tagId);
-      const updatedItems = tagList.filter((item: Tag) => item._id !== tagId);
-      setTagList([...updatedItems]);
-
-      fetchData();
+      if (deleteTagId != "") {
+        console.log(deleteTagId);
+        // Handle other data values as needed
+        await UseDeleteTag(deleteTagId);
+        const updatedItems = tagList.filter(
+          (item: Tag) => item._id !== deleteTagId,
+        );
+        setTagList([...updatedItems]);
+        fetchData();
+      }
+      setDeleteTagId("");
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -176,7 +193,6 @@ const TagListForm = () => {
             </div>
             <div className="mt-4 flex flex-col gap-4 sm:mt-0 sm:flex-row sm:items-start">
               <Link href={PATH.Addtag.path}>
-                {" "}
                 <button
                   className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-gray-200 px-5 py-2 text-blue-300 transition hover:bg-gray-50 hover:text-blue-400 focus:outline-none"
                   type="button"
@@ -212,6 +228,45 @@ const TagListForm = () => {
           />
         </div>
       </div>
+      <Modal
+        show={openModal}
+        size="sm"
+        onClose={() => {
+          setOpenModal(false);
+          setDeleteTagId("");
+        }}
+        popup
+      >
+        <Modal.Header />
+        <Modal.Body>
+          <div className="text-center">
+            <HiOutlineExclamationCircle className="mx-auto mb-4 h-14 w-14 text-gray-400 dark:text-gray-200" />
+            <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
+              Are you sure you want to delete this Tag?
+            </h3>
+            <div className="flex justify-center gap-4">
+              <Button
+                color="failure"
+                onClick={() => {
+                  setOpenModal(false);
+                  deleteTag();
+                }}
+              >
+                {"Yes, I'm sure"}
+              </Button>
+              <Button
+                color="gray"
+                onClick={() => {
+                  setOpenModal(false);
+                  setDeleteTagId("");
+                }}
+              >
+                No, cancel
+              </Button>
+            </div>
+          </div>
+        </Modal.Body>
+      </Modal>
     </>
   );
 };

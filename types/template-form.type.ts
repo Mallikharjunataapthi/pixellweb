@@ -9,5 +9,6 @@ export interface TemplateFormData {
   is_free: string;
   feedType: string;
   is_active: string;
+  app_id: string;
   tag_name: { value: string; label: string }[];
 }

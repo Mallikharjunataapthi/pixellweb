@@ -97,7 +97,6 @@ const MostUsedTemplatesList = () => {
 
       cell: (row: mostusedtemplate) => (
         <Link
-          style={{ width: "50px" }}
           className="text-blue-300 hover:text-red block text-sm"
           href={"category/" + row.cat_id}
         >
@@ -112,7 +111,6 @@ const MostUsedTemplatesList = () => {
 
       cell: (row: mostusedtemplate) => (
         <Link
-          style={{ width: "50px" }}
           className="text-blue-300 hover:text-red block text-sm"
           href={"template/" + row._id}
         >

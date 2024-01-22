@@ -30,8 +30,8 @@ const MostActiveUsersList = () => {
   const [pageSize, setPageSize] = useState(10);
   const [sortField, setSortField] = useState(""); // To store the currently sorted column
   const [sortOrder, setSortOrder] = useState("desc"); // To store the sorting order (asc or desc)
-  const [fromDatestring, setFromDatestring] = useState<Date | null>(null); // Specify the type
-  const [toDateString, setToDatetring] = useState<Date | null>(null); //
+  const [fromDatestring, setFromDatestring] = useState<Date>(new Date(new Date().setDate(new Date().getDate() - 3))); // Specify the type
+  const [toDateString, setToDatetring] = useState<Date >(new Date(new Date().toJSON().slice(0, 10))); //
   useEffect(() => {
     if (fromDatestring != null) {
       try {
@@ -85,7 +85,6 @@ const MostActiveUsersList = () => {
 
       cell: (row: mostactiveusers) => (
         <Link
-          style={{ width: "200px" }}
           className="text-blue-300 hover:text-red block text-sm"
           href={"category/" + row.user_id}
         >

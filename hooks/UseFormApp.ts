@@ -13,7 +13,7 @@ interface UseFormAdminSubmitResult<T> {
   updateForm: (data: T) => Promise<void>;
 }
 
-const UseFormCategory = <T>({
+const UseFormApp = <T>({
   url,
 }: UseFormAdminSubmitProps): UseFormAdminSubmitResult<T> => {
   const [isLoading, setIsLoading] = useState(false);
@@ -75,8 +75,6 @@ const UseFormCategory = <T>({
           errorMessage = error.response.data; // Handle string error
         } else if (error.response.data.message.codeName == "DuplicateKey") {
           errorMessage = "Duplicate";
-        } else if (error.response.data.message == "Category already exists") {
-          errorMessage = error.response.data.message;
         } else {
           errorMessage = "An error occurred while submitting the form";
         }
@@ -98,4 +96,4 @@ const UseFormCategory = <T>({
   return { isLoading, error, success, submitForm, updateForm };
 };
 
-export default UseFormCategory;
+export default UseFormApp;

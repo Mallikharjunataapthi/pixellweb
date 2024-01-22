@@ -15,6 +15,12 @@ import UseFormTemplate from "@/hooks/UseFormTemplate";
 import { Textarea } from "./ui/textarea";
 import { Label } from "./ui/label";
 import { useAdminContext } from "@/context/storeAdmin";
+import Alertpop from "./ui/alertpop";
+import UseGetApp from "@/hooks/UseGetApp";
+interface AppItem {
+  _id: number;
+  app_name: string;
+}
 interface CategoryItem {
   _id: number;
   cat_name: string;
@@ -45,42 +51,59 @@ const TemplateForm = (props: { id: number }) => {
   const [loading, setLoading] = useState(true);
   const [is_FormUpdate, setis_FormUpdate] = useState(false);
   const [tagsData, settagsData] = useState<string[] | []>([]);
+  const [appList, setAppList] = useState([]);
+  const [app_id, setApp_id] = useState("");
   const {
     register,
     handleSubmit,
     setValue,
     formState: { errors },
   } = useForm();
+  const getCatTag = async (appid: string) => {
+    const Categoryurl =
+      getEndpointUrl(ENDPOINTS.category + ENDPOINTS.getActiveList()) +
+      "/" +
+      appid;
+    const resultCategory = await UseGetCategory(Categoryurl);
+    const CategoryOption = resultCategory?.data?.data?.result
+      ? resultCategory?.data?.data?.result.map((item: CategoryItem) => ({
+          label: item.cat_name,
+          value: item._id,
+        }))
+      : [];
+    setCategoryList(CategoryOption);
 
+    const tagurl =
+      getEndpointUrl(ENDPOINTS.tags + ENDPOINTS.getActiveList()) + "/" + appid;
+    const resultTag = await UseGetCategory(tagurl);
+    const tagsOption = resultTag?.data?.data?.result
+      ? resultTag?.data?.data?.result.map((item: TagItem) => ({
+          label: item.tag_name.trim(),
+          value: item.tag_name.trim(),
+        }))
+      : [];
+    setTagList(tagsOption);
+  };
   const fetchData = async () => {
     try {
-      const Categoryurl = getEndpointUrl(
-        ENDPOINTS.category + ENDPOINTS.getActiveList(),
-      );
-      const resultCategory = await UseGetCategory(Categoryurl);
-      const CategoryOption = resultCategory?.data?.data?.result
-        ? resultCategory?.data?.data?.result.map((item: CategoryItem) => ({
-            label: item.cat_name,
+      const appurl = getEndpointUrl(ENDPOINTS.apps);
+      const resultApp = await UseGetApp(appurl);
+      const AppOption = resultApp?.data?.result?.result
+        ? resultApp?.data?.result?.result.map((item: AppItem) => ({
+            label: item.app_name,
             value: item._id,
           }))
         : [];
-      setCategoryList(CategoryOption);
+      setAppList(AppOption);
 
-      const tagurl = getEndpointUrl(ENDPOINTS.tags + ENDPOINTS.getActiveList());
-      const resultTag = await UseGetCategory(tagurl);
-      const tagsOption = resultTag?.data?.data?.result
-        ? resultTag?.data?.data?.result.map((item: TagItem) => ({
-            label: item.tag_name.trim(),
-            value: item.tag_name.trim(),
-          }))
-        : [];
-      setTagList(tagsOption);
       if (templateId != 0) {
         const templateDetails = await UseGetTemplateById(templateId);
         if (
           templateDetails.data.data != undefined &&
           templateDetails.data.data != null
         ) {
+          setApp_id(templateDetails.data.data.app_id);
+          await getCatTag(templateDetails.data.data.app_id);
           setCat_id(templateDetails.data.data.cat_id);
           setTemplate_name(templateDetails.data.data.template_name);
           setBefore_image_url(templateDetails.data.data.before_image_url);
@@ -103,6 +126,7 @@ const TemplateForm = (props: { id: number }) => {
 
           const initialFormValues: { [key: string]: string } = {
             cat_id: templateDetails.data.data.cat_id,
+            app_id: templateDetails.data.data.app_id,
             template_name: templateDetails.data.data.template_name,
             before_image_url:
               templateDetails.data.data.before_image_url.toString(),
@@ -150,6 +174,7 @@ const TemplateForm = (props: { id: number }) => {
     formData.append("is_active", data.is_active.toString());
     formData.append("is_free", data.is_free);
     formData.append("feedType", data.feedType);
+    formData.append("app_id", data.app_id);
     if (data?.propertiesjson) {
       formData.append("propertiesjson", data.propertiesjson);
     }
@@ -219,6 +244,7 @@ const TemplateForm = (props: { id: number }) => {
   if (loading) {
     return <div>Loading...</div>;
   }
+
   return (
     <>
       <div className="py-6">
@@ -231,17 +257,6 @@ const TemplateForm = (props: { id: number }) => {
               <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
                 {is_FormUpdate ? "Update Template " : "Add Template "}
               </h1>
-
-              {success && !error
-                ? is_FormUpdate
-                  ? "Template Updated Successfully!"
-                  : "Template Added Successfully!"
-                : ""}
-              {error && (
-                <p className="font-medium text-red-500 text-xs mt-1">
-                  Error: {error}
-                </p>
-              )}
               <form
                 className="space-y-4 md:space-y-6"
                 onSubmit={handleSubmit(onSubmit)}
@@ -249,10 +264,42 @@ const TemplateForm = (props: { id: number }) => {
               >
                 <div>
                   <label
+                    htmlFor="app_id"
+                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                  >
+                    App Name
+                  </label>
+                  <select
+                    id="app_id"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    {...register("app_id", {
+                      required: "This field is required.",
+                    })}
+                    defaultValue={app_id}
+                    onChange={(e) => {
+                      getCatTag(e.target.value);
+                    }}
+                  >
+                    <option key={0} value="">
+                      {"Select"}
+                    </option>
+
+                    {appList.map((option: { value: number; label: string }) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="font-medium text-red-500 text-xs mt-1">
+                    {errors.app_id?.message as string}
+                  </p>
+                </div>
+                <div>
+                  <label
                     htmlFor="cat_id"
                     className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                   >
-                    Category
+                    Category Name
                   </label>
                   <select
                     id="cat_id"
@@ -277,6 +324,21 @@ const TemplateForm = (props: { id: number }) => {
                   <p className="font-medium text-red-500 text-xs mt-1">
                     {errors.cat_id?.message as string}
                   </p>
+                </div>
+                <div>
+                  <Selectmultiple
+                    id="tag_name"
+                    tagsOption={tagList !== undefined ? tagList : []}
+                    selectLabel="Tags"
+                    register={register}
+                    setValue={setValue}
+                    defaultValue={
+                      tagList !== undefined && tagList?.length > 0
+                        ? tagsData
+                        : []
+                    }
+                    errorMessage={errors.tag_name?.message as string}
+                  ></Selectmultiple>
                 </div>
 
                 <LabelInput
@@ -319,17 +381,6 @@ const TemplateForm = (props: { id: number }) => {
                   <p className="font-medium text-red-500 text-xs mt-1">
                     {errors.after_image_url?.message as string}
                   </p>
-                </div>
-                <div>
-                  <Selectmultiple
-                    id="tag_name"
-                    tagsOption={tagList !== undefined ? tagList : []}
-                    selectLabel="Tags"
-                    register={register}
-                    setValue={setValue}
-                    defaultValue={tagsData}
-                    errorMessage={errors.tag_name?.message as string}
-                  ></Selectmultiple>
                 </div>
                 <div>
                   <Label htmlFor={"propertiesjson"}> Properties Json</Label>
@@ -407,6 +458,16 @@ const TemplateForm = (props: { id: number }) => {
                   </select>
                   {errors.is_active?.message as string}
                 </div>
+                {success && !error
+                  ? is_FormUpdate
+                    ? "Template Updated Successfully!"
+                    : "Template Added Successfully!"
+                  : ""}
+                {error && (
+                  <p className="font-medium text-red-500 text-xs mt-1">
+                    <Alertpop error={error} colors="failure" />
+                  </p>
+                )}
 
                 <button
                   type="submit"

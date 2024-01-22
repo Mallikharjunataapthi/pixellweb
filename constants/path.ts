@@ -39,7 +39,7 @@ export const PATH = {
   AddTemplate: { path: "/admin/add-template", name: "Add Template" },
   TagList: { path: "/admin/tag", name: "Tag" },
   Addtag: { path: "/admin/add-tag", name: "Add Tag" },
-  UsersList: { path: "/admin/users", name: "User" },
+  UsersList: { path: "/admin/users", name: "Admin" },
   TemplateFeedbackList: {
     path: "/admin/template-feedback",
     name: "Template Feedback",
@@ -53,4 +53,7 @@ export const PATH = {
     name: "Most Used Templates",
   },
   ADMINHOME: { path: "/admin/users", name: "Home" },
+  AdddAdmin: { path: "/admin/admin-registration", name: "Add Admin" },
+  App: { path: "/admin/app", name: "App" },
+  AddApp: { path: "/admin/add-app", name: "Add App" },
 };

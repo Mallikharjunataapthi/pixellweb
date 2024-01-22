@@ -1,8 +1,7 @@
-import { getEndpointUrl, ENDPOINTS } from "@/constants/endpoints";
 import axios from "axios";
 import Cookies from "js-cookie";
 
-const UseGetUsers = async (url: string) => {
+const UseGetApp = async (url: string) => {
   try {
     const admintoken = Cookies.get("admintoken");
 
@@ -26,4 +25,4 @@ const UseGetUsers = async (url: string) => {
     }
   }
 };
-export default UseGetUsers;
+export default UseGetApp;

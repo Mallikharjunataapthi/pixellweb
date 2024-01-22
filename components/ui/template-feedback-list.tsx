@@ -9,6 +9,8 @@ import { useAdminContext } from "@/context/storeAdmin";
 import { redirect } from "next/navigation";
 import { PATH } from "@/constants/path";
 import Breadcrumbs from "@/components/breadcrumb";
+import { Button, Modal } from "flowbite-react";
+import { HiOutlineExclamationCircle } from "react-icons/hi";
 interface templatefeedback {
   _id: number;
   template_name: string;
@@ -39,6 +41,8 @@ const TemplateFeedbackListForm = () => {
   const [pageSize, setPageSize] = useState(10);
   const [sortField, setSortField] = useState(""); // To store the currently sorted column
   const [sortOrder, setSortOrder] = useState("desc"); // To store the sorting order (asc or desc)
+  const [openModal, setOpenModal] = useState(false);
+  const [deleteTemplateFeedbackId, setdeleteTemplateFeedbackId] = useState("");
 
   const fetchData = async () => {
     try {
@@ -97,7 +101,6 @@ const TemplateFeedbackListForm = () => {
       sortable: true,
       cell: (row: templatefeedback) => (
         <Link
-          style={{ width: "50px" }}
           className="text-blue-300 hover:text-red block text-sm"
           href={"template/" + row.template_id._id}
         >
@@ -123,11 +126,12 @@ const TemplateFeedbackListForm = () => {
           <div>
             <button
               className="bg-red-700 rounded-sm text-white py-.8 px-1 text-sm m-1"
-              onClick={() =>
-                ActionTemplate(
+              onClick={() => {
+                setOpenModal(true);
+                setdeleteTemplateFeedbackId(
                   getEndpointUrl(ENDPOINTS.templatefeedback + "/" + row._id),
-                )
-              }
+                );
+              }}
             >
               Active
             </button>
@@ -137,14 +141,17 @@ const TemplateFeedbackListForm = () => {
         ),
     },
   ];
-  async function ActionTemplate(url: string) {
-    try {
-      // Handle other data values as needed
-      await UseActionTemplate(url, { is_active: 0 });
-      fetchData();
-    } catch (error) {
-      console.error("Error fetching data:", error);
+  async function ActionTemplate() {
+    if (deleteTemplateFeedbackId != "") {
+      try {
+        // Handle other data values as needed
+        await UseActionTemplate(deleteTemplateFeedbackId, { is_active: 0 });
+        fetchData();
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
     }
+    setdeleteTemplateFeedbackId("");
   }
 
   const handlePageChange = (page: number) => {
@@ -226,6 +233,45 @@ const TemplateFeedbackListForm = () => {
           />
         </div>
       </div>
+      <Modal
+        show={openModal}
+        size="sm"
+        onClose={() => {
+          setOpenModal(false);
+          setdeleteTemplateFeedbackId("");
+        }}
+        popup
+      >
+        <Modal.Header />
+        <Modal.Body>
+          <div className="text-center">
+            <HiOutlineExclamationCircle className="mx-auto mb-4 h-14 w-14 text-gray-400 dark:text-gray-200" />
+            <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
+              Are you sure you want to delete this Template Feedback?
+            </h3>
+            <div className="flex justify-center gap-4">
+              <Button
+                color="failure"
+                onClick={() => {
+                  setOpenModal(false);
+                  ActionTemplate();
+                }}
+              >
+                {"Yes, I'm sure"}
+              </Button>
+              <Button
+                color="gray"
+                onClick={() => {
+                  setOpenModal(false);
+                  setdeleteTemplateFeedbackId("");
+                }}
+              >
+                No, cancel
+              </Button>
+            </div>
+          </div>
+        </Modal.Body>
+      </Modal>
     </>
   );
 };

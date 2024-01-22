@@ -21,47 +21,64 @@ const Pagination: React.FC<PaginationProps> = ({ page, pages, onClick }) => {
 
   return (
     <div className="text-center pb-6">
-      <button
-        className="bg-blue-500 rounded-sm text-white py-2 px-2 mr-3"
-        onClick={() => onClick(1)}
-        disabled={page === 1}
-      >
-        {"<<"}
-      </button>
-      <button
-        className="bg-blue-500 rounded-sm text-white py-2 px-2 mr-3"
-        onClick={() => onClick(page - 1)}
-        disabled={page === 1}
-      >
-        {"<"}
-      </button>
-
-      {pageNumbers.map((pageNumber) => (
+      {pages > 1 ? (
         <button
-          key={pageNumber}
-          className={`${
-            pageNumber === page ? "bg-blue-700" : "bg-blue-500"
-          } rounded-sm text-white py-2 px-2 mr-2`}
-          onClick={() => onClick(pageNumber)}
+          className="bg-blue-500 rounded-sm text-white py-2 px-2 mr-3"
+          onClick={() => onClick(1)}
+          disabled={page === 1}
         >
-          {pageNumber}
+          {"<<"}
         </button>
-      ))}
+      ) : (
+        ""
+      )}
+      {pages > 4 ? (
+        <button
+          className="bg-blue-500 rounded-sm text-white py-2 px-2 mr-3"
+          onClick={() => onClick(page - 1)}
+          disabled={page === 1}
+        >
+          {"<"}
+        </button>
+      ) : (
+        ""
+      )}
+      {pages > 1
+        ? pageNumbers.map((pageNumber) => (
+            <button
+              key={pageNumber}
+              className={`${
+                pageNumber === page ? "bg-blue-700" : "bg-blue-500"
+              } rounded-sm text-white py-2 px-2 mr-2`}
+              onClick={() => onClick(pageNumber)}
+            >
+              {pageNumber}
+            </button>
+          ))
+        : ""}
 
-      <button
-        className="bg-blue-500 rounded-sm text-white py-2 px-2 ml-3"
-        onClick={() => onClick(page + 1)}
-        disabled={page === pages}
-      >
-        {">"}
-      </button>
-      <button
-        className="bg-blue-500 rounded-sm text-white py-2 px-2 ml-3"
-        onClick={() => onClick(pages)}
-        disabled={page === pages}
-      >
-        {">>"}
-      </button>
+      {pages > 1 ? (
+        <button
+          className="bg-blue-500 rounded-sm text-white py-2 px-2 ml-3"
+          onClick={() => onClick(page + 1)}
+          disabled={page === pages}
+        >
+          {">"}
+        </button>
+      ) : (
+        ""
+      )}
+      {pages > 4 ? (
+        <button
+          className="bg-blue-500 rounded-sm text-white py-2 px-2 ml-3"
+          onClick={() => onClick(pages)}
+          disabled={page === pages}
+        >
+          {">>"}
+        </button>
+      ) : (
+        ""
+      )}
       {
         <span className={` rounded-sm  py-2 px-2 mr-2`}>
           Page {page} of {pages}
