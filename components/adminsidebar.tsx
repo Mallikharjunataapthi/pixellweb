@@ -6,9 +6,10 @@ const AdminSidebar = () => {
     title: "Admin",
     items: [
       { children: PATH.UsersList.name, href: PATH.UsersList.path },
+      { children: PATH.App.name, href: PATH.App.path },
       { children: PATH.CategoryList.name, href: PATH.CategoryList.path },
-      { children: PATH.TemplateList.name, href: PATH.TemplateList.path },
       { children: PATH.TagList.name, href: PATH.TagList.path },
+      { children: PATH.TemplateList.name, href: PATH.TemplateList.path },
       {
         children: PATH.TemplateFeedbackList.name,
         href: PATH.TemplateFeedbackList.path,
