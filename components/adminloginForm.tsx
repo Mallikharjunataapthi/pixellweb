@@ -3,7 +3,6 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { PATH } from "@/constants/path";
-import Link from "next/link";
 import UseAdminLogin from "@/hooks/UseAdminLogin";
 type AdminLoginFormProps = {
   username?: string;
