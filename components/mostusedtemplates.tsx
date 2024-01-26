@@ -37,7 +37,6 @@ const MostUsedTemplatesList = () => {
   const [pageSize, setPageSize] = useState(10);
   const [sortField, setSortField] = useState(""); // To store the currently sorted column
   const [sortOrder, setSortOrder] = useState("desc"); // To store the sorting order (asc or desc)
-  const [loading, setLoading] = useState(true);
   useEffect(() => {
     try {
       // Handle other data values as needed
@@ -62,8 +61,6 @@ const MostUsedTemplatesList = () => {
       });
     } catch (error) {
       console.error("Error fetching data:", error);
-    } finally {
-      setLoading(false);
     }
   }, [currentPage, pageSize, sortOrder, sortField]);
   const fetchData = async () => {
@@ -178,13 +175,7 @@ const MostUsedTemplatesList = () => {
       path: PATH.MostUsedTemplates.path,
     },
   ];
-  if (loading) {
-    return (
-      <>
-        <Spinner />
-      </>
-    );
-  }
+
   return (
     <>
       <div className="py-6">
@@ -199,30 +190,34 @@ const MostUsedTemplatesList = () => {
               </h1>
             </div>
           </div>
-          <DataTable
-            columns={columns}
-            data={mostActiveUsersList}
-            highlightOnHover
-            pagination={true}
-            paginationPerPage={10}
-            paginationComponent={() => (
-              <CustomPagination
-                pages={totalPages}
-                page={currentPage}
-                onClick={handlePageChange}
-              />
-            )}
-            paginationComponentOptions={{
-              rowsPerPageText: "Records per page:",
-              rangeSeparatorText: "out of",
-            }}
-            paginationTotalRows={mostActiveUsersList.length * totalPages}
-            onChangePage={handlePageChange}
-            onChangeRowsPerPage={handleRowsPerPageChange}
-            onSort={(column, sortDirection) =>
-              handleSort(column as TableColumn, sortDirection)
-            }
-          />
+          {mostActiveUsersList === null ? (
+            <Spinner /> // Display a loading state
+          ) : (
+            <DataTable
+              columns={columns}
+              data={mostActiveUsersList}
+              highlightOnHover
+              pagination={true}
+              paginationPerPage={10}
+              paginationComponent={() => (
+                <CustomPagination
+                  pages={totalPages}
+                  page={currentPage}
+                  onClick={handlePageChange}
+                />
+              )}
+              paginationComponentOptions={{
+                rowsPerPageText: "Records per page:",
+                rangeSeparatorText: "out of",
+              }}
+              paginationTotalRows={mostActiveUsersList.length * totalPages}
+              onChangePage={handlePageChange}
+              onChangeRowsPerPage={handleRowsPerPageChange}
+              onSort={(column, sortDirection) =>
+                handleSort(column as TableColumn, sortDirection)
+              }
+            />
+          )}
         </div>
       </div>
     </>

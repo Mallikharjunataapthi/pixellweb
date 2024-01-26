@@ -43,7 +43,6 @@ const TemplateListForm = () => {
   const [templateId, setTemplateId] = useState("");
   const [templateactionurl, setTemplateactionurl] = useState("");
   const [actiontype, setActionType] = useState("");
-  const [loading, setLoading] = useState(true);
   const fetchData = async () => {
     try {
       // Handle other data values as needed
@@ -86,10 +85,8 @@ const TemplateListForm = () => {
       });
     } catch (error) {
       console.error("Error fetching data:", error);
-    } finally {
-      setLoading(false);
     }
-  }, [totalPages, currentPage, pageSize, sortField, sortOrder]);
+  }, [totalPages, currentPage, pageSize]);
   const columnsName = [
     { label: "Template Name", value: "template_name" },
     { label: "Category Name", value: "category_name" },
@@ -272,13 +269,6 @@ const TemplateListForm = () => {
       path: PATH.TemplateList.path,
     },
   ];
-  if (loading) {
-    return (
-      <>
-        <Spinner />
-      </>
-    );
-  }
   return (
     <>
       <div className="py-6">
@@ -301,30 +291,34 @@ const TemplateListForm = () => {
               </Link>
             </div>
           </div>
-          <DataTable
-            columns={columns}
-            data={templateList}
-            highlightOnHover
-            pagination={true}
-            paginationPerPage={10}
-            paginationComponent={() => (
-              <CustomPagination
-                pages={totalPages}
-                page={currentPage}
-                onClick={handlePageChange}
-              />
-            )}
-            paginationComponentOptions={{
-              rowsPerPageText: "Records per page:",
-              rangeSeparatorText: "out of",
-            }}
-            paginationTotalRows={templateList.length * totalPages}
-            onChangePage={handlePageChange}
-            onChangeRowsPerPage={handleRowsPerPageChange}
-            onSort={(column, sortDirection) =>
-              handleSort(column as TableColumn, sortDirection)
-            }
-          />
+          {templateList === null ? (
+            <Spinner /> // Display a loading state
+          ) : (
+            <DataTable
+              columns={columns}
+              data={templateList}
+              highlightOnHover
+              pagination={true}
+              paginationPerPage={10}
+              paginationComponent={() => (
+                <CustomPagination
+                  pages={totalPages}
+                  page={currentPage}
+                  onClick={handlePageChange}
+                />
+              )}
+              paginationComponentOptions={{
+                rowsPerPageText: "Records per page:",
+                rangeSeparatorText: "out of",
+              }}
+              paginationTotalRows={templateList.length * totalPages}
+              onChangePage={handlePageChange}
+              onChangeRowsPerPage={handleRowsPerPageChange}
+              onSort={(column, sortDirection) =>
+                handleSort(column as TableColumn, sortDirection)
+              }
+            />
+          )}
         </div>
       </div>
       <Modal

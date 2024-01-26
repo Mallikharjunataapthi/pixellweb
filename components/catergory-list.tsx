@@ -36,7 +36,6 @@ const CategoryListForm = () => {
   const [pageSize, setPageSize] = useState(10);
   const [openModal, setOpenModal] = useState(false);
   const [deleteCatergoryId, setdeleteCatergoryId] = useState("");
-  const [loading, setLoading] = useState(true);
   const fetchdata = async () => {
     try {
       // Handle other data values as needed
@@ -50,8 +49,6 @@ const CategoryListForm = () => {
       });
     } catch (error) {
       console.error("Error fetching data:", error);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -163,13 +160,6 @@ const CategoryListForm = () => {
       path: PATH.CategoryList.path,
     },
   ];
-  if (loading) {
-    return (
-      <>
-        <Spinner />
-      </>
-    );
-  }
   return (
     <>
       <div className="py-6">
@@ -192,30 +182,34 @@ const CategoryListForm = () => {
               </Link>
             </div>
           </div>
-          <DataTable
-            columns={columns}
-            data={categoryList}
-            highlightOnHover
-            pagination={true}
-            paginationPerPage={10}
-            paginationComponent={() => (
-              <CustomPagination
-                pages={totalPages}
-                page={currentPage}
-                onClick={handlePageChange}
-              />
-            )}
-            paginationComponentOptions={{
-              rowsPerPageText: "Records per page:",
-              rangeSeparatorText: "out of",
-            }}
-            paginationTotalRows={categoryList.length * totalPages}
-            onChangePage={handlePageChange}
-            onChangeRowsPerPage={handleRowsPerPageChange}
-            onSort={(column, sortDirection) =>
-              handleSort(column as TableColumn, sortDirection)
-            }
-          />
+          {categoryList === null ? (
+            <Spinner /> // Display a loading state
+          ) : (
+            <DataTable
+              columns={columns}
+              data={categoryList}
+              highlightOnHover
+              pagination={true}
+              paginationPerPage={10}
+              paginationComponent={() => (
+                <CustomPagination
+                  pages={totalPages}
+                  page={currentPage}
+                  onClick={handlePageChange}
+                />
+              )}
+              paginationComponentOptions={{
+                rowsPerPageText: "Records per page:",
+                rangeSeparatorText: "out of",
+              }}
+              paginationTotalRows={categoryList.length * totalPages}
+              onChangePage={handlePageChange}
+              onChangeRowsPerPage={handleRowsPerPageChange}
+              onSort={(column, sortDirection) =>
+                handleSort(column as TableColumn, sortDirection)
+              }
+            />
+          )}
         </div>
       </div>
       <Modal

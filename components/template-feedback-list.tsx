@@ -12,6 +12,7 @@ import Breadcrumbs from "@/components/breadcrumb";
 import { Button, Modal } from "flowbite-react";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
 import Pagination from "./ui/pagenation";
+import Spinner from "./spinner";
 interface templatefeedback {
   _id: string;
   template_name: string;
@@ -202,31 +203,34 @@ const TemplateFeedbackListForm = () => {
               </h1>
             </div>
           </div>
-          <DataTable
-            //title="Category"
-            columns={columns}
-            data={templateList}
-            highlightOnHover
-            pagination={true}
-            paginationPerPage={10}
-            paginationComponent={() => (
-              <CustomPagination
-                pages={totalPages}
-                page={currentPage}
-                onClick={handlePageChange}
-              />
-            )}
-            paginationComponentOptions={{
-              rowsPerPageText: "Records per page:",
-              rangeSeparatorText: "out of",
-            }}
-            paginationTotalRows={templateList.length * totalPages}
-            onChangePage={handlePageChange}
-            onChangeRowsPerPage={handleRowsPerPageChange}
-            onSort={(column, sortDirection) =>
-              handleSort(column as TableColumn, sortDirection)
-            }
-          />
+          {templateList === null ? (
+            <Spinner /> // Display a loading state
+          ) : (
+            <DataTable
+              columns={columns}
+              data={templateList}
+              highlightOnHover
+              pagination={true}
+              paginationPerPage={10}
+              paginationComponent={() => (
+                <CustomPagination
+                  pages={totalPages}
+                  page={currentPage}
+                  onClick={handlePageChange}
+                />
+              )}
+              paginationComponentOptions={{
+                rowsPerPageText: "Records per page:",
+                rangeSeparatorText: "out of",
+              }}
+              paginationTotalRows={templateList.length * totalPages}
+              onChangePage={handlePageChange}
+              onChangeRowsPerPage={handleRowsPerPageChange}
+              onSort={(column, sortDirection) =>
+                handleSort(column as TableColumn, sortDirection)
+              }
+            />
+          )}
         </div>
       </div>
       <Modal
