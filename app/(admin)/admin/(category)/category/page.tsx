@@ -1,5 +1,5 @@
 "use client";
-import CategoryListForm from "@/components/ui/catergory-list";
+import CategoryListForm from "@/components/catergory-list";
 const AdminCategoryListPage = () => {
   return (
     <div className="mx-auto">

@@ -1,5 +1,5 @@
 "use client";
-import TagListForm from "@/components/ui/tag-list";
+import TagListForm from "@/components/tag-list";
 const AdminCategoryListPage = () => {
   return (
     <div className="mx-auto">

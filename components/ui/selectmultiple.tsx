@@ -1,5 +1,5 @@
 import React, { FC } from "react";
-import { Label } from "./ui/label";
+import { Label } from "./label";
 import { useState, useEffect } from "react";
 import { MultiSelect } from "react-multi-select-component";
 
@@ -69,7 +69,6 @@ const Selectmultiple: FC<SelectmultipleProps> = ({
         }}
         labelledBy={id}
         isCreatable={true}
-   
       />
       {errorMessage && (
         <p className="font-medium text-red-500 text-xs mt-1">{errorMessage}</p>

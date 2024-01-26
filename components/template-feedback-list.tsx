@@ -1,42 +1,50 @@
 "use client";
-
 import Link from "next/link";
 import DataTable from "react-data-table-component";
 import { useEffect, useState } from "react";
-import UseGetTag from "@/hooks/UseGetTag";
-import UseDeleteTag from "@/hooks/UseDeleteTag";
-import { PATH } from "@/constants/path";
-import Pagination from "./pagenation";
+import UseActionTemplate from "@/hooks/UseActionTemplate";
+import { getEndpointUrl, ENDPOINTS } from "@/constants/endpoints";
+import UseGetTemplateFeedback from "@/hooks/UseGetTemplateFeedback";
 import { useAdminContext } from "@/context/storeAdmin";
 import { redirect } from "next/navigation";
+import { PATH } from "@/constants/path";
 import Breadcrumbs from "@/components/breadcrumb";
 import { Button, Modal } from "flowbite-react";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
-interface Tag {
+import Pagination from "./ui/pagenation";
+interface templatefeedback {
   _id: string;
-  tag_name: string;
+  template_name: string;
+  template_id: {
+    _id: number;
+    template_name: string;
+  };
+  user_id: {
+    username: string;
+  };
+  app_id: number;
+  app_name: string;
+  feedback: string;
   is_active: number;
-  app_id: { app_name: string; _id: number };
 }
 interface TableColumn {
   label: string;
   name?: string;
 }
-const TagListForm = () => {
+const TemplateFeedbackListForm = () => {
   const { admin } = useAdminContext();
 
   if (!admin) {
     redirect(PATH.ADMIN.path);
   }
-  const [tagList, setTagList] = useState([]);
+  const [templateList, setTemplateList] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [sortField, setSortField] = useState(""); // To store the currently sorted column
   const [sortOrder, setSortOrder] = useState("desc"); // To store the sorting order (asc or desc)
   const [openModal, setOpenModal] = useState(false);
-  const [deleteTagId, setDeleteTagId] = useState("");
-
+  const [deleteTemplateFeedbackId, setdeleteTemplateFeedbackId] = useState("");
   const fetchData = async () => {
     try {
       // Handle other data values as needed
@@ -49,12 +57,11 @@ const TagListForm = () => {
         sortField +
         "&&sortOrder=" +
         sortOrder;
-      await UseGetTag(getData).then((result) => {
-        setTagList(result?.data?.data?.result);
-        setCurrentPage(result?.data?.data?.currentPage);
-        setTotalPages(result?.data?.data?.totalPages);
-        setPageSize(result?.data?.data?.pageSize);
-      });
+      const resultCategory = await UseGetTemplateFeedback(getData);
+      setTemplateList(resultCategory.data.data.data);
+      setCurrentPage(resultCategory.data.data.currentPage);
+      setTotalPages(resultCategory.data.data.totalPages);
+      setPageSize(resultCategory.data.data.pageSize);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -63,71 +70,87 @@ const TagListForm = () => {
     fetchData();
   }, [currentPage]);
   const columnsName = [
-    { label: "Name", value: "tag_name" },
+    { label: "Template Name", value: "template_name" },
+    { label: "User Name", value: "username" },
+    { label: "Feedback", value: "feedback" },
     { label: "Status", value: "is_active" },
   ];
 
   const columns = [
     {
       name: "App Name",
-      selector: (row: Tag) => row?.app_id?.app_name,
+      selector: (row: templatefeedback) => row?.app_name,
       sortable: true,
     },
     {
-      name: "Name",
-      selector: (row: Tag) => row?.tag_name || "",
-
-      cell: (row: Tag) => (
+      name: "Template Name",
+      selector: (row: templatefeedback) => row?.template_id?.template_name,
+      sortable: true,
+      cell: (row: templatefeedback) => (
         <Link
           className="text-blue-300 hover:text-red block text-sm"
-          href={"tag/" + row._id}
+          href={"template/" + row?.template_id?._id}
         >
-          {row?.tag_name || ""}
+          {row?.template_id?.template_name != undefined ||
+          row?.template_id?.template_name != null
+            ? row?.template_id?.template_name
+            : row?.template_id?._id}
         </Link>
       ),
+    },
+    {
+      name: "User Name",
+      selector: (row: templatefeedback) => row?.user_id?.username,
+      sortable: true,
+    },
+    {
+      name: "Feedback",
+      selector: (row: templatefeedback) => row.feedback,
       sortable: true,
     },
     {
       name: "Status",
-      selector: (row: Tag) => (row?.is_active == 1 ? "Active" : "Inactive"),
-      sortable: true,
-    },
-    {
-      name: "Actions",
-      cell: (row: Tag) => (
-        <button
-          className="bg-red-700 rounded-sm text-white py-.8 px-1 text-sm"
-          onClick={() => {
-            setOpenModal(true);
-            setDeleteTagId(row._id);
-          }}
-        >
-          Delete
-        </button>
-      ),
+      cell: (row: templatefeedback) =>
+        row.is_active == 1 ? (
+          <div>
+            <button
+              className="bg-red-700 rounded-sm text-white py-.8 px-1 text-sm m-1"
+              onClick={() => {
+                setOpenModal(true);
+                setdeleteTemplateFeedbackId(
+                  getEndpointUrl(ENDPOINTS.templatefeedback + "/" + row?._id),
+                );
+              }}
+            >
+              Active
+            </button>
+          </div>
+        ) : (
+          <div>Inactive</div>
+        ),
     },
   ];
-  async function deleteTag() {
-    try {
-      if (deleteTagId != "") {
+  async function ActionTemplate() {
+    if (deleteTemplateFeedbackId != "") {
+      try {
         // Handle other data values as needed
-        await UseDeleteTag(deleteTagId);
-        const updatedItems = tagList.filter(
-          (item: Tag) => item._id !== deleteTagId,
+        await UseActionTemplate(deleteTemplateFeedbackId, { is_active: 0 });
+        const updatedItems = templateList.filter(
+          (item: templatefeedback) => item._id !== deleteTemplateFeedbackId,
         );
-        setTagList([...updatedItems]);
         if (updatedItems.length == 0) {
           if (currentPage > 1) {
             setCurrentPage(currentPage - 1);
           }
         }
         fetchData();
+      } catch (error) {
+        console.error("Error fetching data:", error);
       }
-      setDeleteTagId("");
-    } catch (error) {
-      console.error("Error fetching data:", error);
     }
+    setdeleteTemplateFeedbackId("");
   }
+
   const handlePageChange = (page: number) => {
     // Update the current page
     setCurrentPage(page);
@@ -137,7 +160,6 @@ const TagListForm = () => {
     // Update the rows per page and current page
     page;
     setPageSize(newPerPage);
-    fetchData();
   };
   const CustomPagination = ({
     pages,
@@ -148,6 +170,7 @@ const TagListForm = () => {
     page: number;
     onClick: (pageNumber: number) => void;
   }) => <Pagination page={page} pages={pages} onClick={onClick}></Pagination>;
+
   const handleSort = (column: TableColumn, sortDirection: string) => {
     const colname: string = column.name || "";
     const colfield = columnsName.find((col) => col?.label === colname);
@@ -161,8 +184,8 @@ const TagListForm = () => {
       path: PATH.ADMINHOME.path,
     },
     {
-      label: PATH.TagList.name,
-      path: PATH.TagList.path,
+      label: PATH.TemplateFeedbackList.name,
+      path: PATH.TemplateFeedbackList.path,
     },
   ];
   return (
@@ -174,22 +197,15 @@ const TagListForm = () => {
         <div className="lg:col-12">
           <div className="sm:flex sm:items-center sm:justify-between">
             <div className="sm:text-left">
-              <h1 className="font-bold text-gray-900 header-font">Tag </h1>
-            </div>
-            <div className="mt-4 flex flex-col gap-4 sm:mt-0 sm:flex-row sm:items-start">
-              <Link href={PATH.Addtag.path}>
-                <button
-                  className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-gray-200 px-5 py-2 text-blue-300 transition hover:bg-gray-50 hover:text-blue-400 focus:outline-none"
-                  type="button"
-                >
-                  Add Tag
-                </button>
-              </Link>
+              <h1 className="font-bold text-gray-900 header-font">
+                Template User Feedback
+              </h1>
             </div>
           </div>
           <DataTable
+            //title="Category"
             columns={columns}
-            data={tagList}
+            data={templateList}
             highlightOnHover
             pagination={true}
             paginationPerPage={10}
@@ -204,7 +220,7 @@ const TagListForm = () => {
               rowsPerPageText: "Records per page:",
               rangeSeparatorText: "out of",
             }}
-            paginationTotalRows={tagList.length * totalPages}
+            paginationTotalRows={templateList.length * totalPages}
             onChangePage={handlePageChange}
             onChangeRowsPerPage={handleRowsPerPageChange}
             onSort={(column, sortDirection) =>
@@ -218,7 +234,7 @@ const TagListForm = () => {
         size="sm"
         onClose={() => {
           setOpenModal(false);
-          setDeleteTagId("");
+          setdeleteTemplateFeedbackId("");
         }}
         popup
       >
@@ -227,14 +243,14 @@ const TagListForm = () => {
           <div className="text-center">
             <HiOutlineExclamationCircle className="mx-auto mb-4 h-14 w-14 text-gray-400 dark:text-gray-200" />
             <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
-              Are you sure you want to delete this Tag?
+              Are you sure you want to delete this Template Feedback?
             </h3>
             <div className="flex justify-center gap-4">
               <Button
                 color="failure"
                 onClick={() => {
                   setOpenModal(false);
-                  deleteTag();
+                  ActionTemplate();
                 }}
               >
                 {"Yes, I'm sure"}
@@ -243,7 +259,7 @@ const TagListForm = () => {
                 color="gray"
                 onClick={() => {
                   setOpenModal(false);
-                  setDeleteTagId("");
+                  setdeleteTemplateFeedbackId("");
                 }}
               >
                 No, cancel
@@ -256,4 +272,4 @@ const TagListForm = () => {
   );
 };
 
-export default TagListForm;
+export default TemplateFeedbackListForm;

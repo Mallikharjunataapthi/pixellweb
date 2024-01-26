@@ -1,5 +1,5 @@
 "use client";
-import TemplateFeedbackListForm from "@/components/ui/template-feedback-list";
+import TemplateFeedbackListForm from "@/components/template-feedback-list";
 const AdminTemplateListPage = () => {
   return (
     <div className="mx-auto">

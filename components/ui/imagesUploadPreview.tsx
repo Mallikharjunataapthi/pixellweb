@@ -1,6 +1,6 @@
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
-import { Button } from "./ui/button";
+import { Button } from "./button";
 import { ALLOWED_IMAGE_TYPES, FILE_SIZE_LIMIT_MB } from "@/constants/imageType";
 
 export interface ImageUploadPreviewProps

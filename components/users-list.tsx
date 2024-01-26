@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import UseGetUsers from "@/hooks/UseGetUsers";
 import { PATH } from "@/constants/path";
 import { redirect } from "next/navigation";
-import Pagination from "./pagenation";
+import Pagination from "./ui/pagenation";
 import { getEndpointUrl, ENDPOINTS } from "@/constants/endpoints";
 import { useAdminContext } from "@/context/storeAdmin";
 import Breadcrumbs from "@/components/breadcrumb";

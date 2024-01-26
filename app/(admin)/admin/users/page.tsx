@@ -1,5 +1,5 @@
 "use client";
-import UserListForm from "@/components/ui/users-list";
+import UserListForm from "@/components/users-list";
 const AdminRegistrationPage = () => {
   return (
     <div className="mx-auto">

@@ -1,5 +1,5 @@
 "use client";
-import MostUsedTemplatesList from "@/components/ui/mostusedtemplates";
+import MostUsedTemplatesList from "@/components/mostusedtemplates";
 const MostUsedTemplatesPage = () => {
   return (
     <div className="mx-auto">

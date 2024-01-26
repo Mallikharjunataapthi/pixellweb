@@ -1,30 +1,25 @@
 "use client";
-import Link from "next/link";
 import DataTable from "react-data-table-component";
 import { useEffect, useState } from "react";
-import Pagination from "./pagenation";
+import Pagination from "./ui/pagenation";
 import { getEndpointUrl, ENDPOINTS } from "@/constants/endpoints";
 import UseGetReports from "@/hooks/UseGetreports";
+import Link from "next/link";
 import { useAdminContext } from "@/context/storeAdmin";
 import { redirect } from "next/navigation";
 import { PATH } from "@/constants/path";
 import Breadcrumbs from "@/components/breadcrumb";
-interface mostusedtemplate {
-  category_name: string;
-  cat_id: number;
-  template_name: string;
-  _id: number;
-  used_count: number;
-  app_id: {
-    _id: number;
-    app_name: string;
-  };
+interface mostactiveusers {
+  userName: string;
+  appName: string;
+  user_id: number;
+  userCount: number;
 }
 interface TableColumn {
   label: string;
   name?: string;
 }
-const MostUsedTemplatesList = () => {
+const MostActiveUsersList = () => {
   const { admin } = useAdminContext();
 
   if (!admin) {
@@ -36,102 +31,82 @@ const MostUsedTemplatesList = () => {
   const [pageSize, setPageSize] = useState(10);
   const [sortField, setSortField] = useState(""); // To store the currently sorted column
   const [sortOrder, setSortOrder] = useState("desc"); // To store the sorting order (asc or desc)
+  const [fromDatestring, setFromDatestring] = useState<Date>(
+    new Date(new Date().setDate(new Date().getDate() - 7)),
+  ); // Specify the type
+  const [toDateString, setToDatetring] = useState<Date>(
+    new Date(new Date().toJSON().slice(0, 10)),
+  ); //
   useEffect(() => {
-    try {
-      // Handle other data values as needed
-
-      const getData =
-        "?currentPage=" +
-        currentPage +
-        "&&pageSize=" +
-        pageSize +
-        "&&sortField=" +
-        sortField +
-        "&&sortOrder=" +
-        sortOrder;
-      const url = getEndpointUrl(
-        ENDPOINTS.adminreport + ENDPOINTS.mostusedtemplates + getData,
-      );
-      UseGetReports(url).then((result) => {
-        setMostActiveUsersList(result?.data?.result?.data?.result);
-        setCurrentPage(result?.data?.result?.data?.currentPage);
-        setTotalPages(result?.data?.result?.data?.totalPages);
-        setPageSize(result?.data?.result?.data?.pageSize);
-      });
-    } catch (error) {
-      console.error("Error fetching data:", error);
+    if (fromDatestring != null) {
+      try {
+        // Handle other data values as needed
+        const getData =
+          "?currentPage=" +
+          currentPage +
+          "&&pageSize=" +
+          pageSize +
+          "&&sortField=" +
+          sortField +
+          "&&sortOrder=" +
+          sortOrder +
+          (fromDatestring
+            ? "&&fromDatestring=" + fromDatestring.toISOString().split("T")[0]
+            : "") +
+          (fromDatestring && toDateString
+            ? "&&toDateString=" + toDateString.toISOString().split("T")[0]
+            : "");
+        const url = getEndpointUrl(
+          ENDPOINTS.adminreport + ENDPOINTS.mostactiveusers + getData,
+        );
+        // Append string data to the dateSearchData object
+        UseGetReports(url).then((result) => {
+          setMostActiveUsersList(result?.data?.result?.data?.result);
+          setCurrentPage(result?.data?.result?.data?.currentPage);
+          setTotalPages(result?.data?.result?.data?.totalPages);
+          setPageSize(result?.data?.result?.data?.pageSize);
+        });
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
     }
-  }, [currentPage, pageSize, sortOrder, sortField]);
-  const fetchData = async () => {
-    try {
-      // Handle other data values as needed
+  }, [
+    currentPage,
+    pageSize,
+    sortOrder,
+    sortField,
+    fromDatestring,
+    toDateString,
+  ]);
 
-      const getData =
-        "?currentPage=" +
-        currentPage +
-        "&&pageSize=" +
-        pageSize +
-        "&&sortField=" +
-        sortField +
-        "&&sortOrder=" +
-        sortOrder;
-      const url = getEndpointUrl(
-        ENDPOINTS.adminreport + ENDPOINTS.mostusedtemplates + getData,
-      );
-      await UseGetReports(url).then((result) => {
-        setMostActiveUsersList(result?.data?.result?.data?.result);
-        setCurrentPage(result?.data?.result?.data?.currentPage);
-        setTotalPages(result?.data?.result?.data?.totalPages);
-        setPageSize(result?.data?.result?.data?.pageSize);
-      });
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
   const columnsName = [
-    { label: "Category Name", value: "category_name" },
-    { label: "Template Name", value: "template_name" },
-    { label: "Used Count", value: "used_count" },
+    { label: "App Name", value: "appName" },
+    { label: "User Name", value: "userName" },
+    { label: "Used Count", value: "userCount" },
   ];
   const columns = [
     {
       name: "App Name",
-      selector: (row: mostusedtemplate) => row?.app_id?.app_name,
+      selector: (row: mostactiveusers) => row?.appName,
       sortable: true,
     },
     {
-      name: "Category Name",
-      selector: (row: mostusedtemplate) => row?.category_name || "",
+      name: "User Name",
+      selector: (row: mostactiveusers) => row?.userName || "",
 
-      cell: (row: mostusedtemplate) => (
+      cell: (row: mostactiveusers) => (
         <Link
           className="text-blue-300 hover:text-red block text-sm"
-          href={"category/" + row.cat_id}
+          href={"category/" + row.user_id}
         >
-          {row?.category_name || ""}
-        </Link>
-      ),
-      sortable: true,
-    },
-    {
-      name: "Template Name",
-      selector: (row: mostusedtemplate) => row?.template_name || row?._id || "",
-
-      cell: (row: mostusedtemplate) => (
-        <Link
-          className="text-blue-300 hover:text-red block text-sm"
-          href={"template/" + row._id}
-        >
-          {row?.template_name != undefined && row?.template_name != null
-            ? row?.template_name
-            : row._id || ""}
+          {row?.userName || ""}
         </Link>
       ),
       sortable: true,
     },
     {
       name: "Used Count",
-      selector: (row: mostusedtemplate) => row?.used_count,
+      selector: (row: mostactiveusers) => row?.userCount,
       sortable: true,
     },
   ];
@@ -145,7 +120,6 @@ const MostUsedTemplatesList = () => {
     // Update the rows per page and current page
     page;
     setPageSize(newPerPage);
-    fetchData();
   };
   const CustomPagination = ({
     pages,
@@ -170,10 +144,11 @@ const MostUsedTemplatesList = () => {
       path: PATH.ADMINHOME.path,
     },
     {
-      label: PATH.MostUsedTemplates.name,
-      path: PATH.MostUsedTemplates.path,
+      label: PATH.MostActiveUsers.name,
+      path: PATH.MostActiveUsers.path,
     },
   ];
+
   return (
     <>
       <div className="py-6">
@@ -184,7 +159,7 @@ const MostUsedTemplatesList = () => {
           <div className="sm:flex sm:items-center sm:justify-between">
             <div className="sm:text-left">
               <h1 className="font-bold text-gray-900 header-font">
-                Most Used Templates{" "}
+                Most Active Users
               </h1>
             </div>
           </div>
@@ -211,6 +186,31 @@ const MostUsedTemplatesList = () => {
             onSort={(column, sortDirection) =>
               handleSort(column as TableColumn, sortDirection)
             }
+            subHeader
+            subHeaderComponent={
+              <>
+                <label htmlFor="fromDatestring">From Date: </label>
+                <input
+                  type="date"
+                  value={
+                    fromDatestring
+                      ? fromDatestring.toISOString().split("T")[0]
+                      : ""
+                  }
+                  onChange={(e) => setFromDatestring(new Date(e.target.value))}
+                  id="fromDatestring"
+                />
+                <label htmlFor="toDateString">To Date: </label>
+                <input
+                  type="date"
+                  value={
+                    toDateString ? toDateString.toISOString().split("T")[0] : ""
+                  }
+                  onChange={(e) => setToDatetring(new Date(e.target.value))}
+                  id="toDateString"
+                />
+              </>
+            }
           />
         </div>
       </div>
@@ -218,4 +218,4 @@ const MostUsedTemplatesList = () => {
   );
 };
 
-export default MostUsedTemplatesList;
+export default MostActiveUsersList;
