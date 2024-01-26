@@ -63,8 +63,6 @@ const TemplateListForm = () => {
       setPageSize(resultCategory.data.data.pageSize);
     } catch (error) {
       console.error("Error fetching data:", error);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -88,6 +86,8 @@ const TemplateListForm = () => {
       });
     } catch (error) {
       console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
     }
   }, [totalPages, currentPage, pageSize, sortField, sortOrder]);
   const columnsName = [
