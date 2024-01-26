@@ -25,13 +25,17 @@ const UseFormApp = <T>({
     setError("");
 
     try {
-      await axios.post(url, data, {
+      const res = await axios.post(url, data, {
         headers: {
           Authorization: `Bearer ${admintoken}`,
           // Add any other headers if needed
         },
       });
-      setSuccess(true);
+      if (res.data.success == true) {
+        setSuccess(true);
+      } else {
+        setError(res.data.message);
+      }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       if (error.response) {
@@ -48,6 +52,7 @@ const UseFormApp = <T>({
         setError("An error occurred while submitting the form");
       }
     } finally {
+      
       setIsLoading(false);
     }
   };

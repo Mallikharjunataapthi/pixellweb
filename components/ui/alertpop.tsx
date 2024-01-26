@@ -1,14 +1,10 @@
 "use client";
 import React from "react";
 import { Alert } from "flowbite-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 const Alertpop = (props: { error: string; colors: string }) => {
   const [dismissed, setDismissed] = useState(false);
-  useEffect(() => {
-    if (!dismissed) {
-      setDismissed(true);
-    }
-  }, [dismissed]);
+
   return (
     <>
       {!dismissed && (

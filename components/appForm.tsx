@@ -68,13 +68,6 @@ const AppForm = () => {
               <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
                 {"Add App "}
               </h1>
-
-              {success && !error ? "App Added Successfully!" : ""}
-              {error && (
-                <p className="font-medium text-red-500 text-xs mt-1">
-                  <Alertpop error={error} colors="failure" />
-                </p>
-              )}
               <form
                 className="space-y-4 md:space-y-6"
                 onSubmit={handleSubmit(onSubmit)}
@@ -111,7 +104,12 @@ const AppForm = () => {
                     {errors.is_exist?.message as string}
                   </p>
                 </div>
-
+                {success && !error ? "App Added Successfully!" : ""}
+                {error && (
+                  <p className="font-medium text-red-500 text-xs mt-1">
+                    <Alertpop error={error} colors="failure" />
+                  </p>
+                )}
                 <button
                   type="submit"
                   className="w-full rounded-lg bg-blue-500 px-5 py-3 text-sm font-medium text-white"
