@@ -42,7 +42,7 @@ export const PATH = {
   UsersList: { path: "/admin/users", name: "Admin" },
   TemplateFeedbackList: {
     path: "/admin/template-feedback",
-    name: "Template Feedback",
+    name: "Template User Feedback",
   },
   MostActiveUsers: {
     path: "/admin/most-active-users",

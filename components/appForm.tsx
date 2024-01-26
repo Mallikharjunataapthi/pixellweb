@@ -35,7 +35,7 @@ const AppForm = () => {
 
   const is_existOptions = [
     { value: "1", label: "Active" },
-    { value: "0", label: "Inactive" },
+    // { value: "0", label: "Inactive" },
     // Add more options as needed
   ];
 

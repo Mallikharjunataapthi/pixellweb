@@ -35,13 +35,11 @@ const CategoryListForm = () => {
   const [pageSize, setPageSize] = useState(10);
   const [openModal, setOpenModal] = useState(false);
   const [deleteCatergoryId, setdeleteCatergoryId] = useState("");
-
-  useEffect(() => {
+  const fetchdata = async () => {
     try {
       // Handle other data values as needed
-
       const getData = "?currentPage=" + currentPage + "&&pageSize=" + pageSize;
-      const url = getEndpointUrl(ENDPOINTS.category + getData);
+      const url = await getEndpointUrl(ENDPOINTS.category + getData);
       UseGetCategory(url).then((result) => {
         setCategoryList(result?.data?.result?.data?.result);
         setCurrentPage(result?.data?.result?.data?.currentPage);
@@ -51,7 +49,11 @@ const CategoryListForm = () => {
     } catch (error) {
       console.error("Error fetching data:", error);
     }
-  }, [currentPage, pageSize]);
+  };
+
+  useEffect(() => {
+    fetchdata();
+  }, [currentPage]);
   const columnsName = [
     { label: "Name", value: "cat_name" },
     { label: "Status", value: "is_active" },
@@ -108,6 +110,12 @@ const CategoryListForm = () => {
           (item: Category) => item._id !== deleteCatergoryId,
         );
         setCategoryList([...updatedItems]);
+        if (updatedItems.length == 0) {
+          if (currentPage > 1) {
+            setCurrentPage(currentPage - 1);
+          }
+        }
+        fetchdata();
       }
       setdeleteCatergoryId("");
     } catch (error) {

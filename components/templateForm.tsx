@@ -76,13 +76,11 @@ const TemplateForm = (props: { id: number }) => {
     const tagurl =
       getEndpointUrl(ENDPOINTS.tags + ENDPOINTS.getActiveList()) + "/" + appid;
     const resultTag = await UseGetCategory(tagurl);
-    const tagsOption = resultTag?.data?.data?.result
-      ? resultTag?.data?.data?.result.map((item: TagItem) => ({
-          label: item.tag_name.trim(),
-          value: item.tag_name.trim(),
-        }))
-      : [];
-    setTagList(tagsOption);
+    const tagsOptions: string[] = [];
+    resultTag?.data?.data?.result.forEach((item: TagItem) => {
+      tagsOptions.push(item.tag_name);
+    });
+    setTagList(tagsOptions);
   };
   const fetchData = async () => {
     try {
@@ -114,16 +112,18 @@ const TemplateForm = (props: { id: number }) => {
           setIs_free(templateDetails.data.data.is_free);
           setFeedType(templateDetails.data.data.feedType);
           setPropertiesJson(templateDetails.data.data.propertiesjson);
+          const tagsdefaultValueOptions: string[] = [];
+          templateDetails.data.data.tags.forEach((item: string) => {
+            tagsdefaultValueOptions.push(item);
+          });
+          settagsData(tagsdefaultValueOptions);
           const defaultValueFormatted = templateDetails.data.data.tags
             ? templateDetails.data.data.tags.map((item: string) => ({
                 value: item.trim(),
                 label: item.trim(),
               }))
             : [];
-          settagsData(defaultValueFormatted);
-
           setis_FormUpdate(true);
-
           const initialFormValues: { [key: string]: string } = {
             cat_id: templateDetails.data.data.cat_id,
             app_id: templateDetails.data.data.app_id,
@@ -178,10 +178,12 @@ const TemplateForm = (props: { id: number }) => {
     if (data?.propertiesjson) {
       formData.append("propertiesjson", data.propertiesjson);
     }
-    const outputArray: string[] = data.tag_name.map((item) => item.value);
+    console.log(data?.tag_name);
+    const outputArray: string[] = data?.tag_name.map((item) => item.value);
     outputArray.forEach((item, index) => {
       formData.append(`tags[${index}]`, item);
     });
+    console.log(data.tag_name);
     if (
       data.before_image_url?.length != undefined &&
       data.before_image_url?.length > 0
@@ -333,7 +335,7 @@ const TemplateForm = (props: { id: number }) => {
                     register={register}
                     setValue={setValue}
                     defaultValue={
-                      tagList !== undefined && tagList?.length > 0
+                      tagsData !== undefined && tagsData?.length > 0
                         ? tagsData
                         : []
                     }

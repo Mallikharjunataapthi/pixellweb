@@ -9,9 +9,14 @@ import Pagination from "./pagenation";
 import { getEndpointUrl, ENDPOINTS } from "@/constants/endpoints";
 import { useAdminContext } from "@/context/storeAdmin";
 import Breadcrumbs from "@/components/breadcrumb";
+import Image from "next/image";
 interface Tag {
   _id: string;
   username: string;
+  role_id: string;
+  email: string;
+  profile_img: string;
+  app_name: string;
 }
 interface TableColumn {
   label: string;
@@ -50,10 +55,42 @@ const AdminListForm = () => {
 
   const columns = [
     {
+      name: "App Name",
+      selector: (row: Tag) => row?.app_name || "",
+
+      cell: (row: Tag) => row?.app_name || "",
+      sortable: true,
+    },
+    {
       name: "Name",
       selector: (row: Tag) => row?.username || "",
 
       cell: (row: Tag) => row?.username || "",
+      sortable: true,
+    },
+    {
+      name: "Email",
+      selector: (row: Tag) => row?.email || "",
+      cell: (row: Tag) => row?.email || "",
+      sortable: true,
+    },
+    {
+      name: "Profile Image",
+      selector: (row: Tag) => row?.profile_img || "",
+      cell: (row: Tag) => (
+        <Image
+          className="text-blue-300 hover:text-red block text-sm"
+          src={row?.profile_img}
+          alt="test"
+          width={100}
+          height={100}
+        />
+      ),
+    },
+    {
+      name: "Role",
+      selector: (row: Tag) => row?.role_id || "",
+      cell: (row: Tag) => (row?.role_id == "0" ? "Admin" : "User" || ""),
       sortable: true,
     },
   ];
@@ -104,7 +141,7 @@ const AdminListForm = () => {
         <div className="lg:col-12">
           <div className="sm:flex sm:items-center sm:justify-between">
             <div className="sm:text-left">
-              <h1 className="font-bold text-gray-900 header-font">Admin </h1>
+              <h1 className="font-bold text-gray-900 header-font"> User </h1>
             </div>
             <div className="mt-4 flex flex-col gap-4 sm:mt-0 sm:flex-row sm:items-start">
               <Link href={PATH.AdddAdmin.path}>

@@ -15,6 +15,10 @@ interface mostusedtemplate {
   template_name: string;
   _id: number;
   used_count: number;
+  app_id: {
+    _id: number;
+    app_name: string;
+  };
 }
 interface TableColumn {
   label: string;
@@ -89,8 +93,12 @@ const MostUsedTemplatesList = () => {
     { label: "Template Name", value: "template_name" },
     { label: "Used Count", value: "used_count" },
   ];
-
   const columns = [
+    {
+      name: "App Name",
+      selector: (row: mostusedtemplate) => row?.app_id?.app_name,
+      sortable: true,
+    },
     {
       name: "Category Name",
       selector: (row: mostusedtemplate) => row?.category_name || "",
@@ -107,14 +115,16 @@ const MostUsedTemplatesList = () => {
     },
     {
       name: "Template Name",
-      selector: (row: mostusedtemplate) => row?.template_name || "",
+      selector: (row: mostusedtemplate) => row?.template_name || row?._id || "",
 
       cell: (row: mostusedtemplate) => (
         <Link
           className="text-blue-300 hover:text-red block text-sm"
           href={"template/" + row._id}
         >
-          {row?.template_name || ""}
+          {row?.template_name != undefined && row?.template_name != null
+            ? row?.template_name
+            : row._id || ""}
         </Link>
       ),
       sortable: true,

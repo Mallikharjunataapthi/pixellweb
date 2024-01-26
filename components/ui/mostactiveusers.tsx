@@ -11,6 +11,7 @@ import { PATH } from "@/constants/path";
 import Breadcrumbs from "@/components/breadcrumb";
 interface mostactiveusers {
   userName: string;
+  appName: string;
   user_id: number;
   userCount: number;
 }
@@ -79,10 +80,16 @@ const MostActiveUsersList = () => {
   ]);
 
   const columnsName = [
+    { label: "App Name", value: "appName" },
     { label: "User Name", value: "userName" },
     { label: "Used Count", value: "userCount" },
   ];
   const columns = [
+    {
+      name: "App Name",
+      selector: (row: mostactiveusers) => row?.appName,
+      sortable: true,
+    },
     {
       name: "User Name",
       selector: (row: mostactiveusers) => row?.userName || "",

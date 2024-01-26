@@ -12,7 +12,7 @@ import Breadcrumbs from "@/components/breadcrumb";
 import { Button, Modal } from "flowbite-react";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
 interface templatefeedback {
-  _id: number;
+  _id: string;
   template_name: string;
   template_id: {
     _id: number;
@@ -21,6 +21,8 @@ interface templatefeedback {
   user_id: {
     username: string;
   };
+  app_id: number;
+  app_name: string;
   feedback: string;
   is_active: number;
 }
@@ -66,27 +68,8 @@ const TemplateFeedbackListForm = () => {
     }
   };
   useEffect(() => {
-    try {
-      // Handle other data values as needed
-      const getData =
-        "?currentPage=" +
-        currentPage +
-        "&&pageSize=" +
-        pageSize +
-        "&&sortField=" +
-        sortField +
-        "&&sortOrder=" +
-        sortOrder;
-      UseGetTemplateFeedback(getData).then((result) => {
-        setTemplateList(result.data.data.data);
-        setCurrentPage(result.data.data.currentPage);
-        setTotalPages(result.data.data.totalPages);
-        setPageSize(result.data.data.pageSize);
-      });
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  }, [totalPages, currentPage, pageSize, sortOrder, sortField]);
+    fetchData();
+  }, [currentPage]);
   const columnsName = [
     { label: "Template Name", value: "template_name" },
     { label: "User Name", value: "username" },
@@ -96,24 +79,31 @@ const TemplateFeedbackListForm = () => {
 
   const columns = [
     {
+      name: "App Name",
+      selector: (row: templatefeedback) => row?.app_name,
+      sortable: true,
+    },
+    {
       name: "Template Name",
-      selector: (row: templatefeedback) => row.template_id.template_name,
+      selector: (row: templatefeedback) => row?.template_id?.template_name,
       sortable: true,
       cell: (row: templatefeedback) => (
         <Link
           className="text-blue-300 hover:text-red block text-sm"
-          href={"template/" + row.template_id._id}
+          href={"template/" + row?.template_id?._id}
         >
-          {row.template_id.template_name}
+          {row?.template_id?.template_name != undefined ||
+          row?.template_id?.template_name != null
+            ? row?.template_id?.template_name
+            : row?.template_id?._id}
         </Link>
       ),
     },
     {
       name: "User Name",
-      selector: (row: templatefeedback) => row.user_id.username,
+      selector: (row: templatefeedback) => row?.user_id?.username,
       sortable: true,
     },
-
     {
       name: "Feedback",
       selector: (row: templatefeedback) => row.feedback,
@@ -129,7 +119,7 @@ const TemplateFeedbackListForm = () => {
               onClick={() => {
                 setOpenModal(true);
                 setdeleteTemplateFeedbackId(
-                  getEndpointUrl(ENDPOINTS.templatefeedback + "/" + row._id),
+                  getEndpointUrl(ENDPOINTS.templatefeedback + "/" + row?._id),
                 );
               }}
             >
@@ -146,6 +136,14 @@ const TemplateFeedbackListForm = () => {
       try {
         // Handle other data values as needed
         await UseActionTemplate(deleteTemplateFeedbackId, { is_active: 0 });
+        const updatedItems = templateList.filter(
+          (item: templatefeedback) => item._id !== deleteTemplateFeedbackId,
+        );
+        if (updatedItems.length == 0) {
+          if (currentPage > 1) {
+            setCurrentPage(currentPage - 1);
+          }
+        }
         fetchData();
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -163,7 +161,6 @@ const TemplateFeedbackListForm = () => {
     // Update the rows per page and current page
     page;
     setPageSize(newPerPage);
-    fetchData();
   };
   const CustomPagination = ({
     pages,
@@ -202,7 +199,7 @@ const TemplateFeedbackListForm = () => {
           <div className="sm:flex sm:items-center sm:justify-between">
             <div className="sm:text-left">
               <h1 className="font-bold text-gray-900 header-font">
-                Template Feedback
+                Template User Feedback
               </h1>
             </div>
           </div>

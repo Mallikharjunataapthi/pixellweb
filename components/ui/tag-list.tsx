@@ -60,27 +60,8 @@ const TagListForm = () => {
     }
   };
   useEffect(() => {
-    try {
-      // Handle other data values as needed
-      const getData =
-        "?currentPage=" +
-        currentPage +
-        "&&pageSize=" +
-        pageSize +
-        "&&sortField=" +
-        sortField +
-        "&&sortOrder=" +
-        sortOrder;
-      UseGetTag(getData).then((result) => {
-        setTagList(result?.data?.data?.result);
-        setCurrentPage(result?.data?.data?.currentPage);
-        setTotalPages(result?.data?.data?.totalPages);
-        setPageSize(result?.data?.data?.pageSize);
-      });
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  }, [totalPages, currentPage, pageSize, sortOrder, sortField]);
+    fetchData();
+  }, [currentPage]);
   const columnsName = [
     { label: "Name", value: "tag_name" },
     { label: "Status", value: "is_active" },
@@ -129,13 +110,17 @@ const TagListForm = () => {
   async function deleteTag() {
     try {
       if (deleteTagId != "") {
-        console.log(deleteTagId);
         // Handle other data values as needed
         await UseDeleteTag(deleteTagId);
         const updatedItems = tagList.filter(
           (item: Tag) => item._id !== deleteTagId,
         );
         setTagList([...updatedItems]);
+        if (updatedItems.length == 0) {
+          if (currentPage > 1) {
+            setCurrentPage(currentPage - 1);
+          }
+        }
         fetchData();
       }
       setDeleteTagId("");

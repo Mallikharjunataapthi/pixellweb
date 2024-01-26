@@ -113,7 +113,7 @@ const TemplateListForm = () => {
           className="text-blue-300 hover:text-red block text-sm"
           href={"template/" + row._id}
         >
-          {row.template_name}
+          {row.template_name != undefined ? row.template_name : row._id}
         </Link>
       ),
     },
@@ -217,6 +217,11 @@ const TemplateListForm = () => {
           (item: Template) => item._id !== templateId,
         );
         setTemplateList([...updatedItems]);
+        if (updatedItems.length == 0) {
+          if (currentPage > 1) {
+            setCurrentPage(currentPage - 1);
+          }
+        }
         fetchData();
       }
       setTemplateId("");
