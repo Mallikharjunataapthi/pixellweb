@@ -62,13 +62,14 @@ const Selectmultiple: FC<SelectmultipleProps> = ({
       <MultiSelect
         options={options}
         value={selected}
+        {...register(id, { required: "This field is required." })}
         onChange={(selectedValues: Option[]) => {
           setSelected(selectedValues);
           setValue(id, selectedValues);
         }}
         labelledBy={id}
         isCreatable={true}
-        {...register(id, { required: "This field is required." })}
+   
       />
       {errorMessage && (
         <p className="font-medium text-red-500 text-xs mt-1">{errorMessage}</p>
