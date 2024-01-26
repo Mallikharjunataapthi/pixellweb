@@ -9,6 +9,7 @@ import { useAdminContext } from "@/context/storeAdmin";
 import { redirect } from "next/navigation";
 import { PATH } from "@/constants/path";
 import Breadcrumbs from "@/components/breadcrumb";
+import Spinner from "./spinner";
 interface mostusedtemplate {
   category_name: string;
   cat_id: number;
@@ -36,6 +37,7 @@ const MostUsedTemplatesList = () => {
   const [pageSize, setPageSize] = useState(10);
   const [sortField, setSortField] = useState(""); // To store the currently sorted column
   const [sortOrder, setSortOrder] = useState("desc"); // To store the sorting order (asc or desc)
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
     try {
       // Handle other data values as needed
@@ -60,6 +62,8 @@ const MostUsedTemplatesList = () => {
       });
     } catch (error) {
       console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
     }
   }, [currentPage, pageSize, sortOrder, sortField]);
   const fetchData = async () => {
@@ -174,6 +178,13 @@ const MostUsedTemplatesList = () => {
       path: PATH.MostUsedTemplates.path,
     },
   ];
+  if (loading) {
+    return (
+      <>
+        <Spinner />
+      </>
+    );
+  }
   return (
     <>
       <div className="py-6">

@@ -13,6 +13,7 @@ import { useAdminContext } from "@/context/storeAdmin";
 import Breadcrumbs from "@/components/breadcrumb";
 import { Button, Modal } from "flowbite-react";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
+import Spinner from "./spinner";
 interface Template {
   _id: string;
   template_name: string;
@@ -42,6 +43,7 @@ const TemplateListForm = () => {
   const [templateId, setTemplateId] = useState("");
   const [templateactionurl, setTemplateactionurl] = useState("");
   const [actiontype, setActionType] = useState("");
+  const [loading, setLoading] = useState(true);
   const fetchData = async () => {
     try {
       // Handle other data values as needed
@@ -61,6 +63,8 @@ const TemplateListForm = () => {
       setPageSize(resultCategory.data.data.pageSize);
     } catch (error) {
       console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -268,6 +272,13 @@ const TemplateListForm = () => {
       path: PATH.TemplateList.path,
     },
   ];
+  if (loading) {
+    return (
+      <>
+        <Spinner />
+      </>
+    );
+  }
   return (
     <>
       <div className="py-6">

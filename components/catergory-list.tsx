@@ -12,6 +12,7 @@ import { useAdminContext } from "@/context/storeAdmin";
 import Breadcrumbs from "@/components/breadcrumb";
 import { Button, Modal } from "flowbite-react";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
+import Spinner from "./spinner";
 interface Category {
   _id: string;
   cat_name: string;
@@ -35,6 +36,7 @@ const CategoryListForm = () => {
   const [pageSize, setPageSize] = useState(10);
   const [openModal, setOpenModal] = useState(false);
   const [deleteCatergoryId, setdeleteCatergoryId] = useState("");
+  const [loading, setLoading] = useState(true);
   const fetchdata = async () => {
     try {
       // Handle other data values as needed
@@ -48,6 +50,8 @@ const CategoryListForm = () => {
       });
     } catch (error) {
       console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -159,6 +163,13 @@ const CategoryListForm = () => {
       path: PATH.CategoryList.path,
     },
   ];
+  if (loading) {
+    return (
+      <>
+        <Spinner />
+      </>
+    );
+  }
   return (
     <>
       <div className="py-6">

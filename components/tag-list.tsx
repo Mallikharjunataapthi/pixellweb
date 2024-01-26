@@ -12,6 +12,7 @@ import { redirect } from "next/navigation";
 import Breadcrumbs from "@/components/breadcrumb";
 import { Button, Modal } from "flowbite-react";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
+import Spinner from "./spinner";
 interface Tag {
   _id: string;
   tag_name: string;
@@ -36,6 +37,7 @@ const TagListForm = () => {
   const [sortOrder, setSortOrder] = useState("desc"); // To store the sorting order (asc or desc)
   const [openModal, setOpenModal] = useState(false);
   const [deleteTagId, setDeleteTagId] = useState("");
+  const [loading, setLoading] = useState(true);
 
   const fetchData = async () => {
     try {
@@ -57,6 +59,8 @@ const TagListForm = () => {
       });
     } catch (error) {
       console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
     }
   };
   useEffect(() => {
@@ -165,6 +169,13 @@ const TagListForm = () => {
       path: PATH.TagList.path,
     },
   ];
+  if (loading) {
+    return (
+      <>
+        <Spinner />
+      </>
+    );
+  }
   return (
     <>
       <div className="py-6">

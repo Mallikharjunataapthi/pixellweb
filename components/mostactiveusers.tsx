@@ -9,6 +9,7 @@ import { useAdminContext } from "@/context/storeAdmin";
 import { redirect } from "next/navigation";
 import { PATH } from "@/constants/path";
 import Breadcrumbs from "@/components/breadcrumb";
+import Spinner from "./spinner";
 interface mostactiveusers {
   userName: string;
   appName: string;
@@ -31,6 +32,7 @@ const MostActiveUsersList = () => {
   const [pageSize, setPageSize] = useState(10);
   const [sortField, setSortField] = useState(""); // To store the currently sorted column
   const [sortOrder, setSortOrder] = useState("desc"); // To store the sorting order (asc or desc)
+  const [loading, setLoading] = useState(true);
   const [fromDatestring, setFromDatestring] = useState<Date>(
     new Date(new Date().setDate(new Date().getDate() - 7)),
   ); // Specify the type
@@ -68,6 +70,8 @@ const MostActiveUsersList = () => {
         });
       } catch (error) {
         console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
       }
     }
   }, [
@@ -148,6 +152,13 @@ const MostActiveUsersList = () => {
       path: PATH.MostActiveUsers.path,
     },
   ];
+  if (loading) {
+    return (
+      <>
+        <Spinner />
+      </>
+    );
+  }
 
   return (
     <>

@@ -12,6 +12,7 @@ import { useAdminContext } from "@/context/storeAdmin";
 import Breadcrumbs from "@/components/breadcrumb";
 import { Button, Modal } from "flowbite-react";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
+import Spinner from "./spinner";
 interface App {
   _id: string;
   app_name: string;
@@ -34,6 +35,7 @@ const AppListForm = () => {
   const [pageSize, setPageSize] = useState(10);
   const [openModal, setOpenModal] = useState(false);
   const [deleteAppId, setdeleteAppId] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     try {
@@ -49,6 +51,8 @@ const AppListForm = () => {
       });
     } catch (error) {
       console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
     }
   }, [currentPage, pageSize]);
   const columnsName = [
@@ -136,6 +140,13 @@ const AppListForm = () => {
       path: PATH.App.path,
     },
   ];
+  if (loading) {
+    return (
+      <>
+        <Spinner />
+      </>
+    );
+  }
   return (
     <>
       <div className="py-6">

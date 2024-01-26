@@ -12,6 +12,7 @@ import Breadcrumbs from "@/components/breadcrumb";
 import { useAdminContext } from "@/context/storeAdmin";
 import Alertpop from "./ui/alertpop";
 import UseGetApp from "@/hooks/UseGetApp";
+import Spinner from "./spinner";
 interface AppItem {
   _id: number;
   app_name: string;
@@ -42,7 +43,6 @@ const TagForm = (props: { id: number }) => {
     try {
       const appurl = getEndpointUrl(ENDPOINTS.apps);
       const resultApp = await UseGetApp(appurl);
-      console.log(resultApp);
       const AppOption = resultApp?.data?.result?.result
         ? resultApp?.data?.result?.result.map((item: AppItem) => ({
             label: item.app_name,
@@ -122,7 +122,11 @@ const TagForm = (props: { id: number }) => {
     redirect(PATH.TagList.path);
   }
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <>
+        <Spinner />
+      </>
+    );
   }
   return (
     <>
