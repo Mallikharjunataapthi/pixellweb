@@ -43,6 +43,11 @@ const TemplateListForm = () => {
   const [templateId, setTemplateId] = useState("");
   const [templateactionurl, setTemplateactionurl] = useState("");
   const [actiontype, setActionType] = useState("");
+  const TemplateStatus: { [key: string]: string } = {
+    Approved: "Approved",
+    Decline: "Decline",
+    Pending: "Pending",
+  };
   const fetchData = async () => {
     try {
       // Handle other data values as needed
@@ -125,8 +130,7 @@ const TemplateListForm = () => {
     },
     {
       name: "Approved Status",
-      selector: (row: Template) =>
-        row.is_approved == "Approved" ? "Approved" : "Decline",
+      selector: (row: Template) => TemplateStatus[row?.is_approved],
       sortable: true,
     },
     {
@@ -157,7 +161,7 @@ const TemplateListForm = () => {
               onClick={() => {
                 setTemplateactionurl(
                   getEndpointUrl(
-                    ENDPOINTS.templates + ENDPOINTS.approvetemplate(),
+                    ENDPOINTS.templates + ENDPOINTS.declinetemplate(),
                   ),
                 );
                 setTemplateId(row._id);
