@@ -141,7 +141,7 @@ const TemplateListForm = () => {
     {
       name: "Action",
       cell: (row: Template) =>
-        row.is_approved == "Approved" ? (
+        row.is_approved == "Approved" || row.is_approved == "Declined" ? (
           <div>
             <button
               className="bg-red-700 rounded-sm text-white py-.8 px-1 text-sm m-1"
