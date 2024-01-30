@@ -45,7 +45,7 @@ const TemplateListForm = () => {
   const [actiontype, setActionType] = useState("");
   const TemplateStatus: { [key: string]: string } = {
     Approved: "Approved",
-    Decline: "Decline",
+    Declined: "Decline",
     Pending: "Pending",
   };
   const fetchData = async () => {
