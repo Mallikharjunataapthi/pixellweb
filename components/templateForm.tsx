@@ -272,15 +272,16 @@ const TemplateForm = (props: { id: number }) => {
                     App Name
                   </label>
                   <select
-                    id="app_id"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     {...register("app_id", {
                       required: "This field is required.",
                     })}
-                    defaultValue={app_id}
                     onChange={(e) => {
                       getCatTag(e.target.value);
                     }}
+                    id="app_id"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    defaultValue={app_id}
+                 
                   >
                     <option key={0} value="">
                       {"Select"}

@@ -177,7 +177,7 @@ const TemplateListForm = () => {
                 );
                 setTemplateId(row._id);
                 setOpenModal(true);
-                setActionType("Approved");
+                setActionType("Approve");
               }}
             >
               Approved
