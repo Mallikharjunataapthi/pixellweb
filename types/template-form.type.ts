@@ -5,7 +5,7 @@ export interface TemplateFormData {
   after_image_url: File[];
   used_count: number;
   whishlist_count: number;
-  propertiesjson?: string;
+  template_desc: string;
   is_free: string;
   feedType: string;
   is_active: string;

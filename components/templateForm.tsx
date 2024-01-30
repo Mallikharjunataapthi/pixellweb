@@ -43,7 +43,7 @@ const TemplateForm = (props: { id: number }) => {
   const [is_active, setIs_active] = useState(0);
   const [is_free, setIs_free] = useState("Free");
   const [feedType, setFeedType] = useState("Top");
-  const [propertiesjson, setPropertiesJson] = useState("");
+  const [template_desc, settemplate_desc] = useState("");
   const [after_image_loading, setAfter_image_loading] = useState(false);
   const [before_image_loading, setBefore_image_loading] = useState(false);
   const [categorylist, setCategoryList] = useState([]);
@@ -111,7 +111,7 @@ const TemplateForm = (props: { id: number }) => {
           setIs_active(templateDetails.data.data.is_active);
           setIs_free(templateDetails.data.data.is_free);
           setFeedType(templateDetails.data.data.feedType);
-          setPropertiesJson(templateDetails.data.data.propertiesjson);
+          settemplate_desc(templateDetails.data.data.template_desc);
           const tagsdefaultValueOptions: string[] = [];
           templateDetails.data.data.tags.forEach((item: string) => {
             tagsdefaultValueOptions.push(item);
@@ -135,7 +135,7 @@ const TemplateForm = (props: { id: number }) => {
             is_active: templateDetails.data.data.is_active,
             is_free: templateDetails.data.data.is_free,
             feedType: templateDetails.data.data.feedType,
-            propertiesjson: templateDetails.data.data.propertiesjson,
+            template_desc: templateDetails.data.data.template_desc,
             tag_name: defaultValueFormatted,
           };
           Object.keys(initialFormValues).forEach((key) => {
@@ -175,10 +175,7 @@ const TemplateForm = (props: { id: number }) => {
     formData.append("is_free", data.is_free);
     formData.append("feedType", data.feedType);
     formData.append("app_id", data.app_id);
-    if (data?.propertiesjson) {
-      formData.append("propertiesjson", data.propertiesjson);
-    }
-    console.log(data?.tag_name);
+    formData.append("template_desc", data.template_desc);
     const outputArray: string[] = data?.tag_name.map((item) => item.value);
     outputArray.forEach((item, index) => {
       formData.append(`tags[${index}]`, item);
@@ -385,10 +382,11 @@ const TemplateForm = (props: { id: number }) => {
                   </p>
                 </div>
                 <div>
-                  <Label htmlFor={"propertiesjson"}> Properties Json</Label>
+                  <Label htmlFor={"template_desc"}>Json Description</Label>
                   <Textarea
-                    defaultValue={propertiesjson}
-                    id={"propertiesjson"}
+                    id={"template_desc"}
+                    defaultValue={template_desc}
+                    {...register("template_desc", {})}
                   />
                 </div>
                 <div>
