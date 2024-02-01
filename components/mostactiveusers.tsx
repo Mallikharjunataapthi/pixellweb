@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import Pagination from "./ui/pagenation";
 import { getEndpointUrl, ENDPOINTS } from "@/constants/endpoints";
 import UseGetReports from "@/hooks/UseGetreports";
-import Link from "next/link";
 import { useAdminContext } from "@/context/storeAdmin";
 import { redirect } from "next/navigation";
 import { PATH } from "@/constants/path";
@@ -94,15 +93,7 @@ const MostActiveUsersList = () => {
     {
       name: "User Name",
       selector: (row: mostactiveusers) => row?.userName || "",
-
-      cell: (row: mostactiveusers) => (
-        <Link
-          className="text-blue-300 hover:text-red block text-sm"
-          href={"category/" + row.user_id}
-        >
-          {row?.userName || ""}
-        </Link>
-      ),
+      cell: (row: mostactiveusers) => row?.userName || "",
       sortable: true,
     },
     {

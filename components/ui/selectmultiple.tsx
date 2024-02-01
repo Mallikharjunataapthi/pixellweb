@@ -70,7 +70,7 @@ const Selectmultiple: FC<SelectmultipleProps> = ({
         labelledBy={id}
         isCreatable={true}
       />
-      {errorMessage && (
+      {errorMessage && selected.length < 1 && (
         <p className="font-medium text-red-500 text-xs mt-1">{errorMessage}</p>
       )}
     </>

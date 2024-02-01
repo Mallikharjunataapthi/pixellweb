@@ -44,7 +44,7 @@ const AppListForm = () => {
       const url = getEndpointUrl(ENDPOINTS.apps + getData);
       UseGetApp(url).then((result) => {
         setAppList(result?.data?.result?.result);
-        setCurrentPage(result?.data?.result?.data?.currentPage);
+        setCurrentPage(result?.data?.result?.currentPage);
         setTotalPages(result?.data?.result?.totalPages);
         setPageSize(result?.data?.result?.pageSize);
       });
