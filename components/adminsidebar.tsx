@@ -1,7 +1,14 @@
 "use client";
 import Link from "next/link";
 import { PATH } from "@/constants/path";
+import { useAdminContext } from "@/context/storeAdmin";
+import { redirect } from "next/navigation";
 const AdminSidebar = () => {
+  const { admin } = useAdminContext();
+
+  if (!admin) {
+    redirect(PATH.ADMIN.path);
+  }
   const topMenu: Menu = {
     title: "Admin",
     items: [
