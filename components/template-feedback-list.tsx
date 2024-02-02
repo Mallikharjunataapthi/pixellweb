@@ -46,6 +46,7 @@ const TemplateFeedbackListForm = () => {
   const [sortOrder, setSortOrder] = useState("desc"); // To store the sorting order (asc or desc)
   const [openModal, setOpenModal] = useState(false);
   const [deleteTemplateFeedbackId, setdeleteTemplateFeedbackId] = useState("");
+  const [loader, setloader] = useState(true);
   const fetchData = async () => {
     try {
       // Handle other data values as needed
@@ -58,11 +59,20 @@ const TemplateFeedbackListForm = () => {
         sortField +
         "&&sortOrder=" +
         sortOrder;
-      const resultCategory = await UseGetTemplateFeedback(getData);
-      setTemplateList(resultCategory.data.data.data);
-      setCurrentPage(resultCategory.data.data.currentPage);
-      setTotalPages(resultCategory.data.data.totalPages);
-      setPageSize(resultCategory.data.data.pageSize);
+      await UseGetTemplateFeedback(getData)
+        .then((result) => {
+          setTemplateList(result.data.data.data);
+          setCurrentPage(result.data.data.currentPage);
+          setTotalPages(result.data.data.totalPages);
+          setPageSize(result.data.data.pageSize);
+        })
+        .catch((error) => {
+          console.error("Error fetching data:", error);
+          // Handle error state or display an error message
+        })
+        .finally(() => {
+          setloader(false);
+        });
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -203,7 +213,7 @@ const TemplateFeedbackListForm = () => {
               </h1>
             </div>
           </div>
-          {templateList === null ? (
+          {loader == true ? (
             <Spinner /> // Display a loading state
           ) : (
             <DataTable
