@@ -35,19 +35,27 @@ const AppListForm = () => {
   const [pageSize, setPageSize] = useState(10);
   const [openModal, setOpenModal] = useState(false);
   const [deleteAppId, setdeleteAppId] = useState("");
-
+  const [loader, setloader] = useState(true);
   useEffect(() => {
     try {
       // Handle other data values as needed
 
       const getData = "?currentPage=" + currentPage + "&&pageSize=" + pageSize;
       const url = getEndpointUrl(ENDPOINTS.apps + getData);
-      UseGetApp(url).then((result) => {
-        setAppList(result?.data?.result?.result);
-        setCurrentPage(result?.data?.result?.currentPage);
-        setTotalPages(result?.data?.result?.totalPages);
-        setPageSize(result?.data?.result?.pageSize);
-      });
+      UseGetApp(url)
+        .then((result) => {
+          setAppList(result?.data?.result?.result);
+          setCurrentPage(result?.data?.result?.currentPage);
+          setTotalPages(result?.data?.result?.totalPages);
+          setPageSize(result?.data?.result?.pageSize);
+        })
+        .catch((error) => {
+          console.error("Error fetching data:", error);
+          // Handle error state or display an error message
+        })
+        .finally(() => {
+          setloader(false);
+        });
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -137,6 +145,7 @@ const AppListForm = () => {
       path: PATH.App.path,
     },
   ];
+
   return (
     <>
       <div className="py-6">
@@ -159,7 +168,7 @@ const AppListForm = () => {
               </Link>
             </div>
           </div>
-          {appList === null ? (
+          {loader == true ? (
             <Spinner /> // Display a loading state
           ) : (
             <DataTable

@@ -31,6 +31,7 @@ const MostActiveUsersList = () => {
   const [pageSize, setPageSize] = useState(10);
   const [sortField, setSortField] = useState(""); // To store the currently sorted column
   const [sortOrder, setSortOrder] = useState("desc"); // To store the sorting order (asc or desc)
+  const [loader, setloader] = useState(true);
   const [fromDatestring, setFromDatestring] = useState<Date>(
     new Date(new Date().setDate(new Date().getDate() - 7)),
   ); // Specify the type
@@ -60,12 +61,20 @@ const MostActiveUsersList = () => {
           ENDPOINTS.adminreport + ENDPOINTS.mostactiveusers + getData,
         );
         // Append string data to the dateSearchData object
-        UseGetReports(url).then((result) => {
-          setMostActiveUsersList(result?.data?.result?.data?.result);
-          setCurrentPage(result?.data?.result?.data?.currentPage);
-          setTotalPages(result?.data?.result?.data?.totalPages);
-          setPageSize(result?.data?.result?.data?.pageSize);
-        });
+        UseGetReports(url)
+          .then((result) => {
+            setMostActiveUsersList(result?.data?.result?.data?.result);
+            setCurrentPage(result?.data?.result?.data?.currentPage);
+            setTotalPages(result?.data?.result?.data?.totalPages);
+            setPageSize(result?.data?.result?.data?.pageSize);
+          })
+          .catch((error) => {
+            console.error("Error fetching data:", error);
+            // Handle error state or display an error message
+          })
+          .finally(() => {
+            setloader(false);
+          });
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -155,7 +164,7 @@ const MostActiveUsersList = () => {
               </h1>
             </div>
           </div>
-          {mostActiveUsersList === null ? (
+          {loader == true ? (
             <Spinner /> // Display a loading state
           ) : (
             <DataTable

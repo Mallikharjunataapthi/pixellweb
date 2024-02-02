@@ -172,6 +172,10 @@ const CategoryForm = (props: { id: number }) => {
                 <LabelInput
                   register={register("cat_name", {
                     required: requiredMessage,
+                    pattern: {
+                      value: /\S/,
+                      message: "Enter text without empty spaces.",
+                    },
                   })}
                   defaultValue={cat_name || ""}
                   label="Category Name"

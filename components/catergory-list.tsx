@@ -36,17 +36,26 @@ const CategoryListForm = () => {
   const [pageSize, setPageSize] = useState(10);
   const [openModal, setOpenModal] = useState(false);
   const [deleteCatergoryId, setdeleteCatergoryId] = useState("");
+  const [loader, setloader] = useState(true);
   const fetchdata = async () => {
     try {
       // Handle other data values as needed
       const getData = "?currentPage=" + currentPage + "&&pageSize=" + pageSize;
       const url = await getEndpointUrl(ENDPOINTS.category + getData);
-      UseGetCategory(url).then((result) => {
-        setCategoryList(result?.data?.result?.data?.result);
-        setCurrentPage(result?.data?.result?.data?.currentPage);
-        setTotalPages(result?.data?.result?.data?.totalPages);
-        setPageSize(result?.data?.result?.data?.pageSize);
-      });
+      UseGetCategory(url)
+        .then((result) => {
+          setCategoryList(result?.data?.result?.data?.result);
+          setCurrentPage(result?.data?.result?.data?.currentPage);
+          setTotalPages(result?.data?.result?.data?.totalPages);
+          setPageSize(result?.data?.result?.data?.pageSize);
+        })
+        .catch((error) => {
+          console.error("Error fetching data:", error);
+          // Handle error state or display an error message
+        })
+        .finally(() => {
+          setloader(false);
+        });
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -182,7 +191,7 @@ const CategoryListForm = () => {
               </Link>
             </div>
           </div>
-          {categoryList === null ? (
+          {loader == true ? (
             <Spinner /> // Display a loading state
           ) : (
             <DataTable

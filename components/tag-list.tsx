@@ -37,6 +37,7 @@ const TagListForm = () => {
   const [sortOrder, setSortOrder] = useState("desc"); // To store the sorting order (asc or desc)
   const [openModal, setOpenModal] = useState(false);
   const [deleteTagId, setDeleteTagId] = useState("");
+  const [loader, setloader] = useState(true);
 
   const fetchData = async () => {
     try {
@@ -50,12 +51,20 @@ const TagListForm = () => {
         sortField +
         "&&sortOrder=" +
         sortOrder;
-      await UseGetTag(getData).then((result) => {
-        setTagList(result?.data?.data?.result);
-        setCurrentPage(result?.data?.data?.currentPage);
-        setTotalPages(result?.data?.data?.totalPages);
-        setPageSize(result?.data?.data?.pageSize);
-      });
+      await UseGetTag(getData)
+        .then((result) => {
+          setTagList(result?.data?.data?.result);
+          setCurrentPage(result?.data?.data?.currentPage);
+          setTotalPages(result?.data?.data?.totalPages);
+          setPageSize(result?.data?.data?.pageSize);
+        })
+        .catch((error) => {
+          console.error("Error fetching data:", error);
+          // Handle error state or display an error message
+        })
+        .finally(() => {
+          setloader(false);
+        });
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -189,7 +198,7 @@ const TagListForm = () => {
               </Link>
             </div>
           </div>
-          {tagList === null ? (
+          {loader == true ? (
             <Spinner /> // Display a loading state
           ) : (
             <DataTable

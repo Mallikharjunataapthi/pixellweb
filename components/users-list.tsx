@@ -10,6 +10,7 @@ import { getEndpointUrl, ENDPOINTS } from "@/constants/endpoints";
 import { useAdminContext } from "@/context/storeAdmin";
 import Breadcrumbs from "@/components/breadcrumb";
 import Image from "next/image";
+import Spinner from "./spinner";
 interface Tag {
   _id: string;
   username: string;
@@ -33,20 +34,28 @@ const AdminListForm = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-
+  const [loader, setloader] = useState(true);
   useEffect(() => {
     try {
       // Handle other data values as needed
 
       const getData = "?currentPage=" + currentPage + "&&pageSize=" + pageSize;
       const url = getEndpointUrl(ENDPOINTS.users + getData);
-      UseGetUsers(url).then((result) => {
-        console.log(result.data.data.data);
-        setAdminList(result.data.data.data);
-        setCurrentPage(result.data.data.currentPage);
-        setTotalPages(result.data.data.totalPages);
-        setPageSize(result.data.data.pageSize);
-      });
+      UseGetUsers(url)
+        .then((result) => {
+          console.log(result.data.data.data);
+          setAdminList(result.data.data.data);
+          setCurrentPage(result.data.data.currentPage);
+          setTotalPages(result.data.data.totalPages);
+          setPageSize(result.data.data.pageSize);
+        })
+        .catch((error) => {
+          console.error("Error fetching data:", error);
+          // Handle error state or display an error message
+        })
+        .finally(() => {
+          setloader(false);
+        });
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -154,30 +163,34 @@ const AdminListForm = () => {
               </Link>
             </div>
           </div>
-          <DataTable
-            columns={columns}
-            data={adminList}
-            highlightOnHover
-            pagination={true}
-            paginationPerPage={10}
-            paginationComponent={() => (
-              <CustomPagination
-                pages={totalPages}
-                page={currentPage}
-                onClick={handlePageChange}
-              />
-            )}
-            paginationComponentOptions={{
-              rowsPerPageText: "Records per page:",
-              rangeSeparatorText: "out of",
-            }}
-            paginationTotalRows={adminList.length * totalPages}
-            onChangePage={handlePageChange}
-            onChangeRowsPerPage={handleRowsPerPageChange}
-            onSort={(column, sortDirection) =>
-              handleSort(column as TableColumn, sortDirection)
-            }
-          />
+          {loader == true ? (
+            <Spinner /> // Display a loading state
+          ) : (
+            <DataTable
+              columns={columns}
+              data={adminList}
+              highlightOnHover
+              pagination={true}
+              paginationPerPage={10}
+              paginationComponent={() => (
+                <CustomPagination
+                  pages={totalPages}
+                  page={currentPage}
+                  onClick={handlePageChange}
+                />
+              )}
+              paginationComponentOptions={{
+                rowsPerPageText: "Records per page:",
+                rangeSeparatorText: "out of",
+              }}
+              paginationTotalRows={adminList.length * totalPages}
+              onChangePage={handlePageChange}
+              onChangeRowsPerPage={handleRowsPerPageChange}
+              onSort={(column, sortDirection) =>
+                handleSort(column as TableColumn, sortDirection)
+              }
+            />
+          )}
         </div>
       </div>
     </>

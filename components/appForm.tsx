@@ -75,6 +75,10 @@ const AppForm = () => {
                 <LabelInput
                   register={register("app_name", {
                     required: requiredMessage,
+                    pattern: {
+                      value: /\S/,
+                      message: "Enter text without empty spaces.",
+                    },
                   })}
                   label="App Name"
                   errorMessage={errors.app_name?.message as string}

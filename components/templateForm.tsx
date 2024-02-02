@@ -344,6 +344,10 @@ const TemplateForm = (props: { id: number }) => {
                 <LabelInput
                   register={register("template_name", {
                     required: requiredMessage,
+                    pattern: {
+                      value: /\S/,
+                      message: "Enter text without empty spaces.",
+                    },
                   })}
                   defaultValue={template_name || ""}
                   label="Template Name"

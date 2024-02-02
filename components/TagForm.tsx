@@ -176,6 +176,10 @@ const TagForm = (props: { id: number }) => {
                 <LabelInput
                   register={register("tag_name", {
                     required: requiredMessage,
+                    pattern: {
+                      value: /\S/,
+                      message: "Enter text without empty spaces.",
+                    },
                   })}
                   defaultValue={tag_name || ""}
                   label="Tag Name"

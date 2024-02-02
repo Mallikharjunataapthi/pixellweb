@@ -43,6 +43,7 @@ const TemplateListForm = () => {
   const [templateId, setTemplateId] = useState("");
   const [templateactionurl, setTemplateactionurl] = useState("");
   const [actiontype, setActionType] = useState("");
+  const [loader, setloader] = useState(true);
   const TemplateStatus: { [key: string]: string } = {
     Approved: "Approved",
     Declined: "Decline",
@@ -51,15 +52,7 @@ const TemplateListForm = () => {
   const fetchData = async () => {
     try {
       // Handle other data values as needed
-      const getData =
-        "?currentPage=" +
-        currentPage +
-        "&&pageSize=" +
-        pageSize +
-        "&&sortField=" +
-        sortField +
-        "&&sortOrder=" +
-        sortOrder;
+      const getData = "?currentPage=" + currentPage + "&&pageSize=" + pageSize;
       const resultCategory = await UseGetTemplate(getData);
       setTemplateList(resultCategory.data.data.result);
       setCurrentPage(resultCategory.data.data.currentPage);
@@ -82,16 +75,24 @@ const TemplateListForm = () => {
         sortField +
         "&&sortOrder=" +
         sortOrder;
-      UseGetTemplate(getData).then((result) => {
-        setTemplateList(result.data.data.result);
-        setCurrentPage(result.data.data.currentPage);
-        setTotalPages(result.data.data.totalPages);
-        setPageSize(result.data.data.pageSize);
-      });
+      UseGetTemplate(getData)
+        .then((result) => {
+          setTemplateList(result.data.data.result);
+          setCurrentPage(result.data.data.currentPage);
+          setTotalPages(result.data.data.totalPages);
+          setPageSize(result.data.data.pageSize);
+        })
+        .catch((error) => {
+          console.error("Error fetching data:", error);
+          // Handle error state or display an error message
+        })
+        .finally(() => {
+          setloader(false);
+        });
     } catch (error) {
       console.error("Error fetching data:", error);
     }
-  }, [totalPages, currentPage, pageSize]);
+  }, [currentPage, pageSize]);
   const columnsName = [
     { label: "Template Name", value: "template_name" },
     { label: "Category Name", value: "category_name" },
@@ -245,7 +246,7 @@ const TemplateListForm = () => {
     // Update the rows per page and current page
     page;
     setPageSize(newPerPage);
-    fetchData();
+    // fetchData();
   };
   const CustomPagination = ({
     pages,
@@ -295,7 +296,7 @@ const TemplateListForm = () => {
               </Link>
             </div>
           </div>
-          {templateList === null ? (
+          {loader == true ? (
             <Spinner /> // Display a loading state
           ) : (
             <DataTable
