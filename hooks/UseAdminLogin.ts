@@ -3,7 +3,7 @@ import { AdminLoginFormData } from "@/types/admin-login-form.type";
 import axios from "axios";
 import { ENDPOINTS, getEndpointUrl } from "@/constants/endpoints";
 import Cookies from "js-cookie";
-
+import { useAdminContext } from "@/context/storeAdmin";
 interface UseAdminLoginResult {
   isLoading: boolean;
   error: string;
@@ -15,7 +15,6 @@ const UseAdminLogin = (): UseAdminLoginResult => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
-
   const adminlogin = async ({
     username,
     password,
@@ -40,12 +39,16 @@ const UseAdminLogin = (): UseAdminLoginResult => {
       //  Cookies.set("token", idToken);
       if (res.data && res.data.access_token !== "") {
         Cookies.set("admintoken", res.data.access_token);
+        Cookies.set("adminId", res.data.user_id ); // Assuming you get user data after login, adjust accordingly
       } else {
         Cookies.remove("admintoken");
+        Cookies.remove("adminId");
       }
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
+      Cookies.remove("admintoken");
+      Cookies.remove("adminId");
       if (axios.isAxiosError(error)) {
         console.log(error);
 

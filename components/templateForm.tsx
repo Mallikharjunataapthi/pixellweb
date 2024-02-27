@@ -17,6 +17,7 @@ import { Label } from "./ui/label";
 import { useAdminContext } from "@/context/storeAdmin";
 import Alertpop from "./ui/alertpop";
 import UseGetApp from "@/hooks/UseGetApp";
+import Cookies from "js-cookie";
 interface AppItem {
   _id: number;
   app_name: string;
@@ -27,7 +28,6 @@ interface CategoryItem {
 }
 const TemplateForm = (props: { id: number }) => {
   const { admin } = useAdminContext();
-
   if (!admin) {
     redirect(PATH.ADMIN.path);
   }
@@ -167,7 +167,7 @@ const TemplateForm = (props: { id: number }) => {
 
   const onSubmit = ((data: TemplateFormData) => {
     const formData = new FormData();
-
+    const adminId = Cookies.get("adminId");
     // Append string data to the FormData object
     formData.append("cat_id", data.cat_id);
     formData.append("template_name", data.template_name);
@@ -176,6 +176,9 @@ const TemplateForm = (props: { id: number }) => {
     formData.append("feedType", data.feedType);
     formData.append("app_id", data.app_id);
     formData.append("template_desc", data.template_desc);
+    if (adminId !== undefined) {
+      formData.append("user_id", adminId);
+    }
     const outputArray: string[] = data?.tag_name.map((item) => item.value);
     outputArray.forEach((item, index) => {
       formData.append(`tags[${index}]`, item);
