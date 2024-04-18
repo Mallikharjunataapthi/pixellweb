@@ -33,6 +33,7 @@ export const ENDPOINTS = {
   mostactiveusers: "/mostactiveusers",
   mostusedtemplates: "/mostusedtemplates",
   apps: "/apps",
+  adminusers: "/adminusers",
 };
 
 export const getEndpointUrl = (endpoint: string): string => {

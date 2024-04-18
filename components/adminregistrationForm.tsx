@@ -8,7 +8,14 @@ import Alertpop from "./ui/alertpop";
 import { PATH } from "@/constants/path";
 import { redirect } from "next/navigation";
 import Breadcrumbs from "@/components/breadcrumb";
+import UseGetApp from "@/hooks/UseGetApp";
+import { useEffect, useState } from "react";
+interface AppItem {
+  _id: number;
+  app_name: string;
+}
 const AdminRegistrationForm = () => {
+  const [appList, setAppList] = useState([]);
   const {
     register,
     handleSubmit,
@@ -41,7 +48,26 @@ const AdminRegistrationForm = () => {
       path: PATH.AdddAdmin.path,
     },
   ];
-
+  const fetchData = async () => {
+    try {
+      const appurl = getEndpointUrl(ENDPOINTS.apps);
+      const resultApp = await UseGetApp(appurl);
+      const AppOption = resultApp?.data?.result?.result
+        ? resultApp?.data?.result?.result.map((item: AppItem) => ({
+            label: item.app_name,
+            value: item._id,
+          }))
+        : [];
+      setAppList(AppOption);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      // Set loading to false when the data fetch is complete
+    }
+  };
+  useEffect(() => {
+    fetchData();
+  }, []);
   return (
     <>
       <div className="py-6">
@@ -58,6 +84,29 @@ const AdminRegistrationForm = () => {
               >
                 <div>
                   <label
+                    htmlFor="app_id"
+                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                  >
+                    App Name
+                  </label>
+                  <select
+                    id="app_id"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    {...register("app_id", {})}
+                  >
+                    <option key={0} value="">
+                      {"Select"}
+                    </option>
+
+                    {appList.map((option: { value: number; label: string }) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label
                     htmlFor="username"
                     className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                   >
@@ -68,6 +117,28 @@ const AdminRegistrationForm = () => {
                     id="username"
                     {...register("username", {
                       required: "This field is required.",
+                      pattern: {
+                        value: /\S/,
+                        message: "Enter text without empty spaces.",
+                      },
+                    })}
+                    className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    placeholder="name"
+                  />
+                  {errors.username?.message as string}
+                </div>
+                <div>
+                  <label
+                    htmlFor="email"
+                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                  >
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    id="email"
+                    {...register("email", {
+                      required: false,
                       pattern: {
                         value: /\S/,
                         message: "Enter text without empty spaces.",

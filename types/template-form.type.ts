@@ -10,5 +10,7 @@ export interface TemplateFormData {
   feedType: string;
   is_active: string;
   app_id: string;
+  base_image_path: string;
+  user_id: string;
   tag_name: { value: string; label: string }[];
 }

@@ -17,7 +17,7 @@ import { Label } from "./ui/label";
 import { useAdminContext } from "@/context/storeAdmin";
 import Alertpop from "./ui/alertpop";
 import UseGetApp from "@/hooks/UseGetApp";
-import Cookies from "js-cookie";
+import UseGetAdminUsers from "@/hooks/UseGetAdminUsers";
 interface AppItem {
   _id: number;
   app_name: string;
@@ -26,6 +26,11 @@ interface CategoryItem {
   _id: number;
   cat_name: string;
 }
+interface UserItem {
+  _id: number;
+  username: string;
+}
+
 const TemplateForm = (props: { id: number }) => {
   const { admin } = useAdminContext();
   if (!admin) {
@@ -53,6 +58,9 @@ const TemplateForm = (props: { id: number }) => {
   const [tagsData, settagsData] = useState<string[] | []>([]);
   const [appList, setAppList] = useState([]);
   const [app_id, setApp_id] = useState("");
+  const [base_image_path, setBase_image_path] = useState("");
+  const [user_id, setUser_id] = useState("");
+  const [userlist, setUserlist] = useState([]);
   const {
     register,
     handleSubmit,
@@ -60,27 +68,49 @@ const TemplateForm = (props: { id: number }) => {
     formState: { errors },
   } = useForm();
   const getCatTag = async (appid: string) => {
-    const Categoryurl =
-      getEndpointUrl(ENDPOINTS.category + ENDPOINTS.getActiveList()) +
-      "/" +
-      appid;
-    const resultCategory = await UseGetCategory(Categoryurl);
-    const CategoryOption = resultCategory?.data?.data?.result
-      ? resultCategory?.data?.data?.result.map((item: CategoryItem) => ({
-          label: item.cat_name,
-          value: item._id,
-        }))
-      : [];
-    setCategoryList(CategoryOption);
+    if (appid != "") {
+      const userURL =
+        getEndpointUrl(ENDPOINTS.users + ENDPOINTS.adminusers) +
+        "?" +
+        "app_id=" +
+        appid;
+      const resultUser = await UseGetAdminUsers(userURL);
+      const UserOption = resultUser?.data?.data?.data
+        ? resultUser?.data?.data?.data.map((item: UserItem) => ({
+            label: item.username,
+            value: item._id,
+          }))
+        : [];
+      setUserlist(UserOption);
 
-    const tagurl =
-      getEndpointUrl(ENDPOINTS.tags + ENDPOINTS.getActiveList()) + "/" + appid;
-    const resultTag = await UseGetCategory(tagurl);
-    const tagsOptions: string[] = [];
-    resultTag?.data?.data?.result.forEach((item: TagItem) => {
-      tagsOptions.push(item.tag_name);
-    });
-    setTagList(tagsOptions);
+      const Categoryurl =
+        getEndpointUrl(ENDPOINTS.category + ENDPOINTS.getActiveList()) +
+        "/" +
+        appid;
+      const resultCategory = await UseGetCategory(Categoryurl);
+      const CategoryOption = resultCategory?.data?.data?.result
+        ? resultCategory?.data?.data?.result.map((item: CategoryItem) => ({
+            label: item.cat_name,
+            value: item._id,
+          }))
+        : [];
+      setCategoryList(CategoryOption);
+
+      const tagurl =
+        getEndpointUrl(ENDPOINTS.tags + ENDPOINTS.getActiveList()) +
+        "/" +
+        appid;
+      const resultTag = await UseGetCategory(tagurl);
+      const tagsOptions: string[] = [];
+      resultTag?.data?.data?.result.forEach((item: TagItem) => {
+        tagsOptions.push(item.tag_name);
+      });
+      setTagList(tagsOptions);
+    } else {
+      setUserlist([]);
+      setTagList([]);
+      setCategoryList([]);
+    }
   };
   const fetchData = async () => {
     try {
@@ -112,6 +142,8 @@ const TemplateForm = (props: { id: number }) => {
           setIs_free(templateDetails.data.data.is_free);
           setFeedType(templateDetails.data.data.feedType);
           settemplate_desc(templateDetails.data.data.template_desc);
+          setBase_image_path(templateDetails.data.data.base_image_path);
+          setUser_id(templateDetails.data.data.user_id);
           const tagsdefaultValueOptions: string[] = [];
           templateDetails.data.data.tags.forEach((item: string) => {
             tagsdefaultValueOptions.push(item);
@@ -136,7 +168,9 @@ const TemplateForm = (props: { id: number }) => {
             is_free: templateDetails.data.data.is_free,
             feedType: templateDetails.data.data.feedType,
             template_desc: templateDetails.data.data.template_desc,
+            base_image_path: templateDetails.data.data.base_image_path,
             tag_name: defaultValueFormatted,
+            user_id: templateDetails.data.data.user_id,
           };
           Object.keys(initialFormValues).forEach((key) => {
             register(key); // Register the field if not already registered
@@ -167,7 +201,7 @@ const TemplateForm = (props: { id: number }) => {
 
   const onSubmit = ((data: TemplateFormData) => {
     const formData = new FormData();
-    const adminId = Cookies.get("adminId");
+    //const adminId = Cookies.get("adminId");
     // Append string data to the FormData object
     formData.append("cat_id", data.cat_id);
     formData.append("template_name", data.template_name);
@@ -176,14 +210,15 @@ const TemplateForm = (props: { id: number }) => {
     formData.append("feedType", data.feedType);
     formData.append("app_id", data.app_id);
     formData.append("template_desc", data.template_desc);
-    if (adminId !== undefined) {
-      formData.append("user_id", adminId);
-    }
+    formData.append("base_image_path", data.base_image_path);
+    formData.append("user_id", data.user_id);
+    // if (adminId !== undefined) {
+    //   formData.append("user_id", adminId);
+    // }
     const outputArray: string[] = data?.tag_name.map((item) => item.value);
     outputArray.forEach((item, index) => {
       formData.append(`tags[${index}]`, item);
     });
-    console.log(data.tag_name);
     if (
       data.before_image_url?.length != undefined &&
       data.before_image_url?.length > 0
@@ -302,6 +337,37 @@ const TemplateForm = (props: { id: number }) => {
                     htmlFor="cat_id"
                     className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                   >
+                    User Name
+                  </label>
+                  <select
+                    id="user_id"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    {...register("user_id", {
+                      required: "This field is required.",
+                    })}
+                    defaultValue={user_id}
+                  >
+                    <option key={0} value="">
+                      {"Select"}
+                    </option>
+
+                    {userlist.map(
+                      (option: { value: number; label: string }) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ),
+                    )}
+                  </select>
+                  <p className="font-medium text-red-500 text-xs mt-1">
+                    {errors.cat_id?.message as string}
+                  </p>
+                </div>
+                <div>
+                  <label
+                    htmlFor="cat_id"
+                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                  >
                     Category Name
                   </label>
                   <select
@@ -372,7 +438,6 @@ const TemplateForm = (props: { id: number }) => {
                     {errors.before_image_url?.message as string}
                   </p>
                 </div>
-
                 <p className="font-bold text-sm">After Image</p>
                 <div>
                   <ImagesUploadPreview
@@ -389,6 +454,11 @@ const TemplateForm = (props: { id: number }) => {
                     {errors.after_image_url?.message as string}
                   </p>
                 </div>
+                <LabelInput
+                  register={register("base_image_path", {})}
+                  defaultValue={base_image_path || ""}
+                  label="Base Image Path"
+                />
                 <div>
                   <Label htmlFor={"template_desc"}>Json Description</Label>
                   <Textarea
