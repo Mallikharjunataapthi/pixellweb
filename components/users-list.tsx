@@ -99,7 +99,12 @@ const AdminListForm = () => {
     {
       name: "Role",
       selector: (row: Tag) => row?.role_id || "",
-      cell: (row: Tag) => (row?.role_id == "0" ? "Admin" :row?.role_id == "2" ? "Admin User" : "User" || ""),
+      cell: (row: Tag) =>
+        row?.role_id == "0"
+          ? "Admin"
+          : row?.role_id == "2"
+            ? "Admin User"
+            : "User" || "",
       sortable: true,
     },
   ];

@@ -38,7 +38,11 @@ const AppForm = () => {
     // { value: "0", label: "Inactive" },
     // Add more options as needed
   ];
-
+  const is_autoOptions = [
+    { value: "1", label: "Enable" },
+    { value: "0", label: "Disable" },
+    // Add more options as needed
+  ];
   const breadcrumbItems = [
     {
       label: PATH.ADMINHOME.name,
@@ -106,6 +110,31 @@ const AppForm = () => {
                   <p className="font-medium text-red-500 text-xs mt-1">
                     {" "}
                     {errors.is_exist?.message as string}
+                  </p>
+                </div>
+                <div>
+                  <label
+                    htmlFor="is_exist"
+                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                  >
+                    Auto Approvl
+                  </label>
+                  <select
+                    id="is_auto"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    {...register("is_auto", {
+                      required: "This field is required.",
+                    })}
+                  >
+                    {is_autoOptions.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="font-medium text-red-500 text-xs mt-1">
+                    {" "}
+                    {errors.is_auto?.message as string}
                   </p>
                 </div>
                 {success && !error ? "App Added Successfully!" : ""}
