@@ -11,6 +11,7 @@ export interface TemplateFormData {
   is_active: string;
   app_id: string;
   base_image_path: string;
+  purchase_url: string;
   user_id: string;
   tag_name: { value: string; label: string }[];
 }

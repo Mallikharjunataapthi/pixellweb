@@ -59,6 +59,7 @@ const TemplateForm = (props: { id: number }) => {
   const [appList, setAppList] = useState([]);
   const [app_id, setApp_id] = useState("");
   const [base_image_path, setBase_image_path] = useState("");
+  const [purchase_url, setPurchase_url] = useState("");
   const [user_id, setUser_id] = useState("");
   const [userlist, setUserlist] = useState([]);
   const {
@@ -130,6 +131,7 @@ const TemplateForm = (props: { id: number }) => {
           templateDetails.data.data != undefined &&
           templateDetails.data.data != null
         ) {
+          setis_FormUpdate(true);
           setApp_id(templateDetails.data.data.app_id);
           await getCatTag(templateDetails.data.data.app_id);
           setCat_id(templateDetails.data.data.cat_id);
@@ -143,6 +145,7 @@ const TemplateForm = (props: { id: number }) => {
           setFeedType(templateDetails.data.data.feedType);
           settemplate_desc(templateDetails.data.data.template_desc);
           setBase_image_path(templateDetails.data.data.base_image_path);
+          setPurchase_url(templateDetails.data.data.purchase_url);
           setUser_id(templateDetails.data.data.user_id);
           const tagsdefaultValueOptions: string[] = [];
           templateDetails.data.data.tags.forEach((item: string) => {
@@ -155,7 +158,6 @@ const TemplateForm = (props: { id: number }) => {
                 label: item.trim(),
               }))
             : [];
-          setis_FormUpdate(true);
           const initialFormValues: { [key: string]: string } = {
             cat_id: templateDetails.data.data.cat_id,
             app_id: templateDetails.data.data.app_id,
@@ -169,6 +171,7 @@ const TemplateForm = (props: { id: number }) => {
             feedType: templateDetails.data.data.feedType,
             template_desc: templateDetails.data.data.template_desc,
             base_image_path: templateDetails.data.data.base_image_path,
+            purchase_url: templateDetails.data.data.purchase_url,
             tag_name: defaultValueFormatted,
             user_id: templateDetails.data.data.user_id,
           };
@@ -211,6 +214,7 @@ const TemplateForm = (props: { id: number }) => {
     formData.append("app_id", data.app_id);
     formData.append("template_desc", data.template_desc);
     formData.append("base_image_path", data.base_image_path);
+    formData.append("purchase_url", data.purchase_url);
     formData.append("user_id", data.user_id);
     // if (adminId !== undefined) {
     //   formData.append("user_id", adminId);
@@ -454,6 +458,11 @@ const TemplateForm = (props: { id: number }) => {
                     {errors.after_image_url?.message as string}
                   </p>
                 </div>
+                <LabelInput
+                  register={register("purchase_url", {})}
+                  defaultValue={purchase_url || ""}
+                  label="Purchase url"
+                />
                 <LabelInput
                   register={register("base_image_path", {})}
                   defaultValue={base_image_path || ""}
