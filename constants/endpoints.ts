@@ -9,7 +9,6 @@ export const ENDPOINTS = {
   getActiveList: () => `/activelist`,
   declinetemplate: () => `/declinetemplate`,
   approvetemplate: () => `/approvetemplate`,
-
   users: "/users",
   templates: "/templates",
   addtemplate: "/templates",
@@ -34,6 +33,8 @@ export const ENDPOINTS = {
   mostusedtemplates: "/mostusedtemplates",
   apps: "/apps",
   adminusers: "/adminusers",
+  appsuser: "/app-user",
+  signup: "/signup",
 };
 
 export const getEndpointUrl = (endpoint: string): string => {

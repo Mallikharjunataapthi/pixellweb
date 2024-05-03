@@ -559,6 +559,7 @@ const TemplateForm = (props: { id: number }) => {
                 <button
                   type="submit"
                   className="w-full rounded-lg bg-blue-500 px-5 py-3 text-sm font-medium text-white"
+                  disabled={isLoading}
                 >
                   {isLoading ? "Submitting..." : "Submit"}{" "}
                 </button>

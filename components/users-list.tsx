@@ -17,7 +17,7 @@ interface Tag {
   role_id: string;
   email: string;
   profile_img: string;
-  app_name: string;
+  app_id: { app_name: string };
 }
 interface TableColumn {
   label: string;
@@ -43,7 +43,6 @@ const AdminListForm = () => {
       const url = getEndpointUrl(ENDPOINTS.users + getData);
       UseGetUsers(url)
         .then((result) => {
-          console.log(result.data.data.data);
           setAdminList(result.data.data.data);
           setCurrentPage(result.data.data.currentPage);
           setTotalPages(result.data.data.totalPages);
@@ -65,16 +64,22 @@ const AdminListForm = () => {
   const columns = [
     {
       name: "App Name",
-      selector: (row: Tag) => row?.app_name || "",
+      selector: (row: Tag) => row?.app_id?.app_name || "",
 
-      cell: (row: Tag) => row?.app_name || "",
+      cell: (row: Tag) => row?.app_id?.app_name || "",
       sortable: true,
     },
     {
       name: "Name",
       selector: (row: Tag) => row?.username || "",
-
-      cell: (row: Tag) => row?.username || "",
+      cell: (row: Tag) => (
+        <Link
+          className="text-blue-300 hover:text-red block text-sm"
+          href={"admin-registration/" + row._id}
+        >
+          {row?.username || ""}
+        </Link>
+      ),
       sortable: true,
     },
     {
@@ -86,15 +91,18 @@ const AdminListForm = () => {
     {
       name: "Profile Image",
       selector: (row: Tag) => row?.profile_img || "",
-      cell: (row: Tag) => (
-        <Image
-          className="text-blue-300 hover:text-red block text-sm"
-          src={row?.profile_img}
-          alt="test"
-          width={100}
-          height={100}
-        />
-      ),
+      cell: (row: Tag) =>
+        row?.profile_img !== undefined &&
+        row?.profile_img !== null &&
+        row?.profile_img !== "" && (
+          <Image
+            className="text-blue-300 hover:text-red block text-sm"
+            src={row?.profile_img || ""}
+            alt="test"
+            width={100}
+            height={100}
+          />
+        ),
     },
     {
       name: "Role",

@@ -5,7 +5,7 @@ import AdminRegistrationForm from "@/components/adminregistrationForm";
 const AdminRegistrationPage = () => {
   return (
     <div className="mx-auto">
-      <AdminRegistrationForm />
+      <AdminRegistrationForm id={0} />
     </div>
   );
 };
