@@ -1,34 +1,34 @@
 import { useState } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
-interface UseFormAdminSubmitProps {
+interface UseFormAdminTemplateSubmitProps {
   url: string;
 }
 
-interface UseFormAdminSubmitResult<T> {
+interface UseFormAdminTemplateSubmitResult<T> {
   isLoading: boolean;
   error: string;
   success: boolean;
-  submitForm: (formData: any) => Promise<void>;
-  updateForm: (formData: any) => Promise<void>;
+  templateSubmitForm: (data: T, formData: any) => Promise<void>;
+  templateUpdateForm: (data: T, formData: any) => Promise<void>;
 }
 
-const UseFormCategory = <T>({
+const UseFormTemplate = <T>({
   url,
-}: UseFormAdminSubmitProps): UseFormAdminSubmitResult<T> => {
+}: UseFormAdminTemplateSubmitProps): UseFormAdminTemplateSubmitResult<T> => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const admintoken = Cookies.get("admintoken");
-  const submitForm = async (formData: any): Promise<void> => {
+  const templateSubmitForm = async (data: T, formData: any): Promise<void> => {
     setIsLoading(true);
     setError("");
 
     try {
       await axios.post(url, formData, {
         headers: {
+          "content-type": "multipart/form-data",
           Authorization: `Bearer ${admintoken}`,
-          // Add any other headers if needed
         },
       });
       setSuccess(true);
@@ -51,15 +51,15 @@ const UseFormCategory = <T>({
       setIsLoading(false);
     }
   };
-  const updateForm = async (formData: any): Promise<void> => {
+  const templateUpdateForm = async (data: T, formData: any): Promise<void> => {
     setIsLoading(true);
     setError("");
 
     try {
       await axios.patch(url, formData, {
         headers: {
+          "content-type": "multipart/form-data",
           Authorization: `Bearer ${admintoken}`,
-          // Add any other headers if needed
         },
       });
       setSuccess(true);
@@ -68,20 +68,7 @@ const UseFormCategory = <T>({
       if (error.response) {
         // The request was made and the server responded with a status code
         console.error(error.response.data);
-        //setError(error.response.data.message);
-        let errorMessage: string;
-
-        if (typeof error.response.data === "string") {
-          errorMessage = error.response.data; // Handle string error
-        } else if (error.response.data.message.codeName == "DuplicateKey") {
-          errorMessage = "Duplicate";
-        } else if (error.response.data.message == "Category already exists") {
-          errorMessage = error.response.data.message;
-        } else {
-          errorMessage = "An error occurred while submitting the form";
-        }
-
-        setError(errorMessage);
+        setError(error.response.data.message);
       } else if (error.request) {
         // The request was made but no response was received
         console.error(error.request);
@@ -95,7 +82,7 @@ const UseFormCategory = <T>({
       setIsLoading(false);
     }
   };
-  return { isLoading, error, success, submitForm, updateForm };
+  return { isLoading, error, success, templateSubmitForm, templateUpdateForm };
 };
 
-export default UseFormCategory;
+export default UseFormTemplate;

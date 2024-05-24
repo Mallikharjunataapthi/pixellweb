@@ -1,45 +1,44 @@
 "use client";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { ENDPOINTS, getEndpointUrl } from "@/constants/endpoints";
-import { CategoryFormData } from "@/types/category-form.type";
+import { TagFormData } from "@/types/tag-form.type";
 import { useEffect, useState } from "react";
-import UseGetCategoryById from "@/hooks/UseGetCategoryById";
+import UseGetTagById from "@/hooks/UseGetTagById";
 import { redirect } from "next/navigation";
 import { PATH } from "@/constants/path";
 import LabelInput from "@/components/labelInput";
-import UseFormCategory from "@/hooks/UseFormCategory";
+import useFormTag from "@/hooks/useFormtag";
 import Breadcrumbs from "@/components/breadcrumb";
 import { useAdminContext } from "@/context/storeAdmin";
 import Alertpop from "./ui/alertpop";
 import UseGetApp from "@/hooks/UseGetApp";
-import ImagesUploadPreview from "./ui/imagesUploadPreview";
+import Spinner from "./spinner";
 interface AppItem {
   _id: number;
   app_name: string;
 }
-const CategoryForm = (props: { id: number }) => {
+const TagForm = (props: { id: number }) => {
   const { admin } = useAdminContext();
 
   if (!admin) {
     redirect(PATH.ADMIN.path);
   }
   const requiredMessage = "This field is required.";
-  const [cat_name, setCat_name] = useState("");
+  const [tag_name, settag_name] = useState("");
+  const [oldTagName, setoldTagName] = useState("");
   const [is_active, setis_active] = useState("");
   const [is_FormUpdate, setis_FormUpdate] = useState(false);
   const [appList, setAppList] = useState([]);
   const [app_id, setApp_id] = useState("");
-  const [image_url, setimage_url] = useState("");
   const [loading, setLoading] = useState(true);
-  const catid = props.id;
+  const tagid = props.id;
 
   const {
     register,
     handleSubmit,
     setValue,
-    formState: { errors },
+    formState: { errors, isValid },
   } = useForm();
-
   const fetchData = async () => {
     try {
       const appurl = getEndpointUrl(ENDPOINTS.apps);
@@ -51,22 +50,18 @@ const CategoryForm = (props: { id: number }) => {
           }))
         : [];
       setAppList(AppOption);
-      if (catid != 0) {
-        const categoryDetails = await UseGetCategoryById(catid);
-        if (
-          categoryDetails.data.data != undefined &&
-          categoryDetails.data.data != null
-        ) {
-          setApp_id(categoryDetails.data.data.app_id);
-          setCat_name(categoryDetails.data.data.cat_name);
-          setis_active(categoryDetails.data.data.is_active);
-          setimage_url(categoryDetails?.data?.data?.image_url);
+      if (tagid != 0) {
+        const tagDetails = await UseGetTagById(tagid);
+        if (tagDetails.data.data != undefined && tagDetails.data.data != null) {
+          settag_name(tagDetails.data.data.tag_name);
+          setoldTagName(tagDetails.data.data.tag_name);
+          setis_active(tagDetails.data.data.is_active);
+          setApp_id(tagDetails.data.data.app_id);
           setis_FormUpdate(true);
-          const initialFormValues: { [key: string]: string } = {
-            cat_name: categoryDetails.data.data.cat_name,
-            is_active: categoryDetails.data.data.is_active,
-            app_id: categoryDetails.data.data.app_id,
-            image_url: categoryDetails?.data?.data?.image_url,
+          const initialFormValues: { [key: string]: string | number } = {
+            tag_name: tagDetails.data.data.tag_name,
+            is_active: tagDetails.data.data.is_active,
+            app_id: tagDetails.data.data.app_id,
           };
           Object.keys(initialFormValues).forEach((key) => {
             register(key); // Register the field if not already registered
@@ -76,39 +71,30 @@ const CategoryForm = (props: { id: number }) => {
       }
     } catch (error) {
       console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
   useEffect(() => {
     fetchData();
   }, []);
   let url;
   if (is_FormUpdate == true) {
-    url = getEndpointUrl(ENDPOINTS.addcategory + "/" + catid);
+    url = getEndpointUrl(ENDPOINTS.templates + ENDPOINTS.updateTag(tagid));
   } else {
-    url = getEndpointUrl(ENDPOINTS.addcategory);
+    url = getEndpointUrl(ENDPOINTS.tags);
   }
   const { isLoading, error, success, submitForm, updateForm } =
-    UseFormCategory<CategoryFormData>({
+    useFormTag<TagFormData>({
       url: url,
     });
-  const onSubmit = ((data: CategoryFormData) => {
-    const formData1 = new FormData();
-    formData1.append("app_id", data.app_id);
-    formData1.append("cat_name", data.cat_name);
-    formData1.append("is_active", data.is_active);
-    if (data.image_url?.length != undefined && data.image_url?.length > 0) {
-      if (data.image_url) {
-        for (const file of data.image_url) {
-          formData1.append("image_url", file);
-        }
-      }
-    }
-    if (catid != 0 && catid != null && catid != undefined) {
-      updateForm(formData1);
+
+  const onSubmit = ((data: TagFormData) => {
+    if (tagid != 0 && tagid != null && tagid != undefined) {
+      data.oldTagName = oldTagName;
+      updateForm(data);
     } else {
-      submitForm(formData1);
+      submitForm(data);
     }
   }) as SubmitHandler<FieldValues>;
 
@@ -124,19 +110,23 @@ const CategoryForm = (props: { id: number }) => {
       path: PATH.ADMINHOME.path,
     },
     {
-      label: PATH.CategoryList.name,
-      path: PATH.CategoryList.path,
+      label: PATH.TagList.name,
+      path: PATH.TagList.path,
     },
     {
-      label: is_FormUpdate ? "Update Category" : PATH.AddCategory.name,
-      path: PATH.AddCategory.path,
+      label: is_FormUpdate ? "Update Tag" : PATH.Addtag.name,
+      path: PATH.Addtag.path,
     },
   ];
   if (success) {
-    redirect(PATH.CategoryList.path);
+    redirect(PATH.TagList.path);
   }
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <>
+        <Spinner />
+      </>
+    );
   }
   return (
     <>
@@ -148,7 +138,7 @@ const CategoryForm = (props: { id: number }) => {
           <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
             <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
               <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
-                {is_FormUpdate ? "Update Category " : "Add Category "}
+                {is_FormUpdate ? "Update Tag " : "Add Tag "}
               </h1>
               <form
                 className="space-y-4 md:space-y-6"
@@ -184,31 +174,17 @@ const CategoryForm = (props: { id: number }) => {
                   </p>
                 </div>
                 <LabelInput
-                  register={register("cat_name", {
+                  register={register("tag_name", {
                     required: requiredMessage,
                     pattern: {
                       value: /\S/,
                       message: "Enter text without empty spaces.",
                     },
                   })}
-                  defaultValue={cat_name || ""}
-                  label="Category Name"
-                  errorMessage={errors.cat_name?.message as string}
+                  defaultValue={tag_name || ""}
+                  label="Tag Name"
+                  errorMessage={errors.tag_name?.message as string}
                 />
-                <p className="font-bold text-sm">Image</p>
-                <div>
-                  <ImagesUploadPreview
-                    id="image_url"
-                    buttonLabel="Add  Image"
-                    removeLabel="Remove Image"
-                    previewShape="rectangle"
-                    defaultValue={image_url}
-                    requiredimg={false}
-                    //isLoading={before_image_loading}
-                    register={register}
-                    setValue={setValue}
-                  />
-                </div>
                 <div>
                   <label
                     htmlFor="is_active"
@@ -230,25 +206,23 @@ const CategoryForm = (props: { id: number }) => {
                       </option>
                     ))}
                   </select>
-                  <p className="font-medium text-red-500 text-xs mt-1">
-                    {" "}
-                    {errors.is_active?.message as string}
-                  </p>
+                  {errors.is_active?.message as string}
                 </div>
                 {success && !error
                   ? is_FormUpdate
-                    ? "Category Updated Successfully!"
-                    : "Category Added Successfully!"
+                    ? "Tag Updated Successfully!"
+                    : "Tag Added Successfully!"
                   : ""}
                 {error && (
                   <p className="font-medium text-red-500 text-xs mt-1">
                     <Alertpop error={error} colors="failure" />
                   </p>
                 )}
+
                 <button
                   type="submit"
                   className="w-full rounded-lg bg-blue-500 px-5 py-3 text-sm font-medium text-white"
-                  disabled={isLoading}
+                  disabled={(!is_FormUpdate ? !isValid : "") || isLoading}
                 >
                   {isLoading ? "Submitting..." : "Submit"}{" "}
                 </button>
@@ -261,4 +235,4 @@ const CategoryForm = (props: { id: number }) => {
   );
 };
 
-export default CategoryForm;
+export default TagForm;

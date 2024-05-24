@@ -12,7 +12,6 @@ import Breadcrumbs from "@/components/breadcrumb";
 import { useAdminContext } from "@/context/storeAdmin";
 import Alertpop from "./ui/alertpop";
 import UseGetApp from "@/hooks/UseGetApp";
-import ImagesUploadPreview from "./ui/imagesUploadPreview";
 interface AppItem {
   _id: number;
   app_name: string;
@@ -29,7 +28,6 @@ const CategoryForm = (props: { id: number }) => {
   const [is_FormUpdate, setis_FormUpdate] = useState(false);
   const [appList, setAppList] = useState([]);
   const [app_id, setApp_id] = useState("");
-  const [image_url, setimage_url] = useState("");
   const [loading, setLoading] = useState(true);
   const catid = props.id;
 
@@ -37,7 +35,7 @@ const CategoryForm = (props: { id: number }) => {
     register,
     handleSubmit,
     setValue,
-    formState: { errors },
+    formState: { errors, isValid },
   } = useForm();
 
   const fetchData = async () => {
@@ -60,13 +58,11 @@ const CategoryForm = (props: { id: number }) => {
           setApp_id(categoryDetails.data.data.app_id);
           setCat_name(categoryDetails.data.data.cat_name);
           setis_active(categoryDetails.data.data.is_active);
-          setimage_url(categoryDetails?.data?.data?.image_url);
           setis_FormUpdate(true);
           const initialFormValues: { [key: string]: string } = {
             cat_name: categoryDetails.data.data.cat_name,
             is_active: categoryDetails.data.data.is_active,
             app_id: categoryDetails.data.data.app_id,
-            image_url: categoryDetails?.data?.data?.image_url,
           };
           Object.keys(initialFormValues).forEach((key) => {
             register(key); // Register the field if not already registered
@@ -93,22 +89,12 @@ const CategoryForm = (props: { id: number }) => {
     UseFormCategory<CategoryFormData>({
       url: url,
     });
+
   const onSubmit = ((data: CategoryFormData) => {
-    const formData1 = new FormData();
-    formData1.append("app_id", data.app_id);
-    formData1.append("cat_name", data.cat_name);
-    formData1.append("is_active", data.is_active);
-    if (data.image_url?.length != undefined && data.image_url?.length > 0) {
-      if (data.image_url) {
-        for (const file of data.image_url) {
-          formData1.append("image_url", file);
-        }
-      }
-    }
     if (catid != 0 && catid != null && catid != undefined) {
-      updateForm(formData1);
+      updateForm(data);
     } else {
-      submitForm(formData1);
+      submitForm(data);
     }
   }) as SubmitHandler<FieldValues>;
 
@@ -195,20 +181,6 @@ const CategoryForm = (props: { id: number }) => {
                   label="Category Name"
                   errorMessage={errors.cat_name?.message as string}
                 />
-                <p className="font-bold text-sm">Image</p>
-                <div>
-                  <ImagesUploadPreview
-                    id="image_url"
-                    buttonLabel="Add  Image"
-                    removeLabel="Remove Image"
-                    previewShape="rectangle"
-                    defaultValue={image_url}
-                    requiredimg={false}
-                    //isLoading={before_image_loading}
-                    register={register}
-                    setValue={setValue}
-                  />
-                </div>
                 <div>
                   <label
                     htmlFor="is_active"
@@ -248,7 +220,7 @@ const CategoryForm = (props: { id: number }) => {
                 <button
                   type="submit"
                   className="w-full rounded-lg bg-blue-500 px-5 py-3 text-sm font-medium text-white"
-                  disabled={isLoading}
+                  disabled={(!is_FormUpdate ? !isValid : "") || isLoading}
                 >
                   {isLoading ? "Submitting..." : "Submit"}{" "}
                 </button>

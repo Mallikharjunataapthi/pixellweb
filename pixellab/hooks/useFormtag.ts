@@ -9,23 +9,22 @@ interface UseFormAdminSubmitResult<T> {
   isLoading: boolean;
   error: string;
   success: boolean;
-  submitForm: (formData: any) => Promise<void>;
-  updateForm: (formData: any) => Promise<void>;
+  submitForm: (data: T) => Promise<void>;
+  updateForm: (data: T) => Promise<void>;
 }
 
-const UseFormCategory = <T>({
+const useFormTag = <T>({
   url,
 }: UseFormAdminSubmitProps): UseFormAdminSubmitResult<T> => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const admintoken = Cookies.get("admintoken");
-  const submitForm = async (formData: any): Promise<void> => {
+  const submitForm = async (data: T): Promise<void> => {
     setIsLoading(true);
     setError("");
-
     try {
-      await axios.post(url, formData, {
+      await axios.post(url, data, {
         headers: {
           Authorization: `Bearer ${admintoken}`,
           // Add any other headers if needed
@@ -51,12 +50,12 @@ const UseFormCategory = <T>({
       setIsLoading(false);
     }
   };
-  const updateForm = async (formData: any): Promise<void> => {
+  const updateForm = async (data: T): Promise<void> => {
     setIsLoading(true);
     setError("");
 
     try {
-      await axios.patch(url, formData, {
+      await axios.patch(url, data, {
         headers: {
           Authorization: `Bearer ${admintoken}`,
           // Add any other headers if needed
@@ -75,8 +74,6 @@ const UseFormCategory = <T>({
           errorMessage = error.response.data; // Handle string error
         } else if (error.response.data.message.codeName == "DuplicateKey") {
           errorMessage = "Duplicate";
-        } else if (error.response.data.message == "Category already exists") {
-          errorMessage = error.response.data.message;
         } else {
           errorMessage = "An error occurred while submitting the form";
         }
@@ -98,4 +95,4 @@ const UseFormCategory = <T>({
   return { isLoading, error, success, submitForm, updateForm };
 };
 
-export default UseFormCategory;
+export default useFormTag;

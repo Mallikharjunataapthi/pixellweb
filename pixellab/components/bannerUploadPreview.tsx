@@ -1,6 +1,6 @@
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
-import { Button } from "./button";
+import { Button } from "./ui/button";
 import { ALLOWED_IMAGE_TYPES, FILE_SIZE_LIMIT_MB } from "@/constants/imageType";
 
 export interface ImageUploadPreviewProps
@@ -14,16 +14,14 @@ export interface ImageUploadPreviewProps
   register: any;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   setValue: any;
-  requiredimg?: boolean;
 }
 
-const ImagesUploadPreview = React.forwardRef<
+const BannerUploadPreview = React.forwardRef<
   HTMLInputElement,
   ImageUploadPreviewProps
 >(
   (
     {
-      id,
       buttonLabel,
       removeLabel,
       previewShape,
@@ -31,17 +29,14 @@ const ImagesUploadPreview = React.forwardRef<
       isLoading,
       register,
       setValue,
-      requiredimg,
       ...props
     },
     ref,
   ) => {
     const [file, setFile] = useState<File | null>(null);
     const [previewUrl, setPreviewUrl] = useState<string>("");
-
     useEffect(() => {
       if (defaultValue) setPreviewUrl(defaultValue.toString());
-
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isLoading]);
 
@@ -65,7 +60,7 @@ const ImagesUploadPreview = React.forwardRef<
     const removeImage = () => {
       setFile(null);
       setPreviewUrl("");
-      setValue(id, "", { shouldDirty: true });
+      setValue("bannerFile", "", { shouldDirty: true });
     };
 
     return (
@@ -92,12 +87,7 @@ const ImagesUploadPreview = React.forwardRef<
                 className="w-full h-full opacity-0 z-10 absolute curs"
                 multiple={false}
                 ref={ref}
-                {...register(id, {
-                  required: requiredimg
-                    ? file || previewUrl
-                      ? false
-                      : "This image is required."
-                    : false, // Set required to false if there is a default value
+                {...register("bannerFile", {
                   validate: {
                     acceptedFormats: (files: File[] | string) => {
                       if (!files || !files[0] || typeof files === "string") {
@@ -159,6 +149,6 @@ const ImagesUploadPreview = React.forwardRef<
   },
 );
 
-ImagesUploadPreview.displayName = "ImagesUploadPreview";
+BannerUploadPreview.displayName = "BannerUploadPreview";
 
-export default ImagesUploadPreview;
+export default BannerUploadPreview;

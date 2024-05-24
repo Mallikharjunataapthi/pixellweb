@@ -14,7 +14,6 @@ export interface ImageUploadPreviewProps
   register: any;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   setValue: any;
-  requiredimg?: boolean;
 }
 
 const ImagesUploadPreview = React.forwardRef<
@@ -31,7 +30,6 @@ const ImagesUploadPreview = React.forwardRef<
       isLoading,
       register,
       setValue,
-      requiredimg,
       ...props
     },
     ref,
@@ -93,11 +91,8 @@ const ImagesUploadPreview = React.forwardRef<
                 multiple={false}
                 ref={ref}
                 {...register(id, {
-                  required: requiredimg
-                    ? file || previewUrl
-                      ? false
-                      : "This image is required."
-                    : false, // Set required to false if there is a default value
+                  required:
+                    file || previewUrl ? false : "This image is required.", // Set required to false if there is a default value
                   validate: {
                     acceptedFormats: (files: File[] | string) => {
                       if (!files || !files[0] || typeof files === "string") {

@@ -230,6 +230,7 @@ const TemplateForm = (props: { id: number }) => {
       if (data.before_image_url) {
         for (const file of data.before_image_url) {
           formData.append("before_image_url", file);
+          console.log(file);
         }
       }
     }
@@ -437,7 +438,6 @@ const TemplateForm = (props: { id: number }) => {
                     isLoading={before_image_loading}
                     register={register}
                     setValue={setValue}
-                    requiredimg={true}
                   />
                   <p className="font-medium text-red-500 text-xs mt-1">
                     {errors.before_image_url?.message as string}
@@ -454,7 +454,6 @@ const TemplateForm = (props: { id: number }) => {
                     isLoading={after_image_loading}
                     register={register}
                     setValue={setValue}
-                    requiredimg={true}
                   />
                   <p className="font-medium text-red-500 text-xs mt-1">
                     {errors.after_image_url?.message as string}

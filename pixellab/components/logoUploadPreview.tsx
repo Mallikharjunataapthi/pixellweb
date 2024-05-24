@@ -1,6 +1,6 @@
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
-import { Button } from "./button";
+import { Button } from "./ui/button";
 import { ALLOWED_IMAGE_TYPES, FILE_SIZE_LIMIT_MB } from "@/constants/imageType";
 
 export interface ImageUploadPreviewProps
@@ -14,16 +14,16 @@ export interface ImageUploadPreviewProps
   register: any;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   setValue: any;
-  requiredimg?: boolean;
 }
 
-const ImagesUploadPreview = React.forwardRef<
+const requiredMessage = "This field is required.";
+
+const LogoUploadPreview = React.forwardRef<
   HTMLInputElement,
   ImageUploadPreviewProps
 >(
   (
     {
-      id,
       buttonLabel,
       removeLabel,
       previewShape,
@@ -31,17 +31,16 @@ const ImagesUploadPreview = React.forwardRef<
       isLoading,
       register,
       setValue,
-      requiredimg,
       ...props
     },
     ref,
   ) => {
     const [file, setFile] = useState<File | null>(null);
     const [previewUrl, setPreviewUrl] = useState<string>("");
+    const [isRemoved, setIsRemoved] = useState<boolean>(false);
 
     useEffect(() => {
       if (defaultValue) setPreviewUrl(defaultValue.toString());
-
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isLoading]);
 
@@ -59,13 +58,15 @@ const ImagesUploadPreview = React.forwardRef<
 
       if (filteredFiles.length > 0) {
         setFile(filteredFiles[0]);
+        setIsRemoved(false);
       }
     };
 
     const removeImage = () => {
       setFile(null);
       setPreviewUrl("");
-      setValue(id, "", { shouldDirty: true });
+      setIsRemoved(true);
+      setValue("logoFile", "", { shouldDirty: true });
     };
 
     return (
@@ -92,23 +93,24 @@ const ImagesUploadPreview = React.forwardRef<
                 className="w-full h-full opacity-0 z-10 absolute curs"
                 multiple={false}
                 ref={ref}
-                {...register(id, {
-                  required: requiredimg
-                    ? file || previewUrl
-                      ? false
-                      : "This image is required."
-                    : false, // Set required to false if there is a default value
+                {...register("logoFile", {
                   validate: {
-                    acceptedFormats: (files: File[] | string) => {
-                      if (!files || !files[0] || typeof files === "string") {
-                        return true;
-                      }
+                    acceptedFormats: (files: File[]) => {
+                      if (!files || !files[0]) return true;
                       return (
                         ALLOWED_IMAGE_TYPES.includes(files[0]?.type) ||
-                        "Only PNG, JPEG and JPG"
+                        "Only supports PNG, JPEG and JPG"
                       );
                     },
                     lessThan5MB: (files: File[]) => {
+                      // no image from the beginning
+                      if (!defaultValue && files && !files.length) {
+                        return requiredMessage;
+                      }
+                      // remove default image
+                      if (defaultValue && isRemoved) {
+                        return requiredMessage;
+                      }
                       if (
                         files &&
                         files[0]?.size > FILE_SIZE_LIMIT_MB * 1024 * 1024
@@ -159,6 +161,6 @@ const ImagesUploadPreview = React.forwardRef<
   },
 );
 
-ImagesUploadPreview.displayName = "ImagesUploadPreview";
+LogoUploadPreview.displayName = "LogoUploadPreview";
 
-export default ImagesUploadPreview;
+export default LogoUploadPreview;
