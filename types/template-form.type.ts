@@ -14,4 +14,6 @@ export interface TemplateFormData {
   purchase_url: string;
   user_id: string;
   tag_name: { value: string; label: string }[];
+  aspect_ratio_x: string;
+  aspect_ratio_y: string;
 }

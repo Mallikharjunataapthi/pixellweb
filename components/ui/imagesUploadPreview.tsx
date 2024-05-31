@@ -88,7 +88,7 @@ const ImagesUploadPreview = React.forwardRef<
                 {...props}
                 type="file"
                 onChangeCapture={handleFile}
-                accept=".jpg,.jpeg,.png"
+                accept=".jpg,.jpeg,.png,.gif"
                 className="w-full h-full opacity-0 z-10 absolute curs"
                 multiple={false}
                 ref={ref}
@@ -105,7 +105,7 @@ const ImagesUploadPreview = React.forwardRef<
                       }
                       return (
                         ALLOWED_IMAGE_TYPES.includes(files[0]?.type) ||
-                        "Only PNG, JPEG and JPG"
+                        "Only PNG, JPEG, JPG and GIF"
                       );
                     },
                     lessThan5MB: (files: File[]) => {

@@ -62,6 +62,8 @@ const TemplateForm = (props: { id: number }) => {
   const [purchase_url, setPurchase_url] = useState("");
   const [user_id, setUser_id] = useState("");
   const [userlist, setUserlist] = useState([]);
+  const [aspect_ratio_x, setAspect_ratio_x] = useState(3);
+  const [aspect_ratio_y, setAspect_ratio_y] = useState(4);
   const {
     register,
     handleSubmit,
@@ -147,6 +149,8 @@ const TemplateForm = (props: { id: number }) => {
           setBase_image_path(templateDetails.data.data.base_image_path);
           setPurchase_url(templateDetails.data.data.purchase_url);
           setUser_id(templateDetails.data.data.user_id);
+          setAspect_ratio_x(templateDetails.data.data.aspect_ratio_x);
+          setAspect_ratio_y(templateDetails.data.data.aspect_ratio_y);
           const tagsdefaultValueOptions: string[] = [];
           templateDetails.data.data.tags.forEach((item: string) => {
             tagsdefaultValueOptions.push(item);
@@ -174,6 +178,8 @@ const TemplateForm = (props: { id: number }) => {
             purchase_url: templateDetails.data.data.purchase_url,
             tag_name: defaultValueFormatted,
             user_id: templateDetails.data.data.user_id,
+            aspect_ratio_x: templateDetails.data.data.aspect_ratio_x,
+            aspect_ratio_y: templateDetails.data.data.aspect_ratio_y,
           };
           Object.keys(initialFormValues).forEach((key) => {
             register(key); // Register the field if not already registered
@@ -216,6 +222,8 @@ const TemplateForm = (props: { id: number }) => {
     formData.append("base_image_path", data.base_image_path);
     formData.append("purchase_url", data.purchase_url);
     formData.append("user_id", data.user_id);
+    formData.append("aspect_ratio_x", data.aspect_ratio_x);
+    formData.append("aspect_ratio_y", data.aspect_ratio_y);
     // if (adminId !== undefined) {
     //   formData.append("user_id", adminId);
     // }
@@ -460,6 +468,16 @@ const TemplateForm = (props: { id: number }) => {
                     {errors.after_image_url?.message as string}
                   </p>
                 </div>
+                <LabelInput
+                  register={register("aspect_ratio_x", {})}
+                  defaultValue={aspect_ratio_x || ""}
+                  label="Aspect Ratio X"
+                />
+                <LabelInput
+                  register={register("aspect_ratio_y", {})}
+                  defaultValue={aspect_ratio_y || ""}
+                  label="Aspect Ratio Y"
+                />
                 <LabelInput
                   register={register("purchase_url", {})}
                   defaultValue={purchase_url || ""}
