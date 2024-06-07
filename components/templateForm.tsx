@@ -222,8 +222,8 @@ const TemplateForm = (props: { id: number }) => {
     formData.append("base_image_path", data.base_image_path);
     formData.append("purchase_url", data.purchase_url);
     formData.append("user_id", data.user_id);
-    formData.append("aspect_ratio_x", data.aspect_ratio_x);
-    formData.append("aspect_ratio_y", data.aspect_ratio_y);
+    formData.append("aspect_ratio_x",`${data.aspect_ratio_x}` );
+    formData.append("aspect_ratio_y", `${data.aspect_ratio_y}` );
     // if (adminId !== undefined) {
     //   formData.append("user_id", adminId);
     // }
