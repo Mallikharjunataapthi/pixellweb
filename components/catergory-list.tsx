@@ -13,6 +13,7 @@ import Breadcrumbs from "@/components/breadcrumb";
 import { Button, Modal } from "flowbite-react";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
 import Spinner from "./spinner";
+import UseGetApp from "@/hooks/UseGetApp";
 interface Category {
   _id: string;
   cat_name: string;
@@ -22,6 +23,10 @@ interface Category {
 interface TableColumn {
   label: string;
   name?: string;
+}
+interface AppItem {
+  _id: number;
+  app_name: string;
 }
 const CategoryListForm = () => {
   const { admin } = useAdminContext();
@@ -37,10 +42,29 @@ const CategoryListForm = () => {
   const [openModal, setOpenModal] = useState(false);
   const [deleteCatergoryId, setdeleteCatergoryId] = useState("");
   const [loader, setloader] = useState(true);
+  const [appList, setAppList] = useState([]);
+  const [searchApp, setSearchApp] = useState("");
+  const fetchAppList = async () => {
+    const appurl = getEndpointUrl(ENDPOINTS.apps);
+    const resultApp = await UseGetApp(appurl);
+    const AppOption = resultApp?.data?.result?.result
+      ? resultApp?.data?.result?.result.map((item: AppItem) => ({
+          label: item.app_name,
+          value: item._id,
+        }))
+      : [];
+    setAppList(AppOption);
+  };
   const fetchdata = async () => {
     try {
       // Handle other data values as needed
-      const getData = "?currentPage=" + currentPage + "&&pageSize=" + pageSize;
+      const getData =
+        "?currentPage=" +
+        currentPage +
+        "&&pageSize=" +
+        pageSize +
+        "&&searchApp=" +
+        searchApp;
       const url = await getEndpointUrl(ENDPOINTS.category + getData);
       UseGetCategory(url)
         .then((result) => {
@@ -60,10 +84,13 @@ const CategoryListForm = () => {
       console.error("Error fetching data:", error);
     }
   };
-
   useEffect(() => {
     fetchdata();
-  }, [currentPage]);
+    fetchAppList();
+  }, []);
+  useEffect(() => {
+    fetchdata();
+  }, [currentPage, searchApp]);
   const columnsName = [
     { label: "Name", value: "cat_name" },
     { label: "Status", value: "is_active" },
@@ -179,6 +206,26 @@ const CategoryListForm = () => {
           <div className="sm:flex sm:items-center sm:justify-between">
             <div className="sm:text-left">
               <h1 className="font-bold text-gray-900 header-font">Category </h1>
+            </div>
+            <div className="mt-4 flex flex-col gap-4 sm:mt-0 sm:flex-row sm:items-start">
+              <select
+                id="app_id"
+                className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                onChange={(e) => {
+                  setSearchApp(e.target.value);
+                  setCurrentPage(1);
+                  setPageSize(10);
+                }}
+              >
+                <option key={0} value="">
+                  {"Select App"}
+                </option>
+                {appList.map((option: { value: number; label: string }) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
             </div>
             <div className="mt-4 flex flex-col gap-4 sm:mt-0 sm:flex-row sm:items-start">
               <Link href={PATH.AddCategory.path}>

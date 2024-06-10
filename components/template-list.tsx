@@ -14,6 +14,7 @@ import Breadcrumbs from "@/components/breadcrumb";
 import { Button, Modal } from "flowbite-react";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
 import Spinner from "./spinner";
+import UseGetApp from "@/hooks/UseGetApp";
 interface Template {
   _id: string;
   template_name: string;
@@ -26,6 +27,10 @@ interface Template {
 interface TableColumn {
   label: string;
   name?: string;
+}
+interface AppItem {
+  _id: number;
+  app_name: string;
 }
 const TemplateListForm = () => {
   const { admin } = useAdminContext();
@@ -44,6 +49,9 @@ const TemplateListForm = () => {
   const [templateactionurl, setTemplateactionurl] = useState("");
   const [actiontype, setActionType] = useState("");
   const [loader, setloader] = useState(true);
+  const [appList, setAppList] = useState([]);
+  const [searchApp, setSearchApp] = useState("");
+  const [searchApproved, setSearchApproved] = useState("");
   const TemplateStatus: { [key: string]: string } = {
     Approved: "Approved",
     Declined: "Decline",
@@ -62,8 +70,18 @@ const TemplateListForm = () => {
       console.error("Error fetching data:", error);
     }
   };
-
-  useEffect(() => {
+  const fetchAppData = async () => {
+    const appurl = getEndpointUrl(ENDPOINTS.apps);
+    const resultApp = await UseGetApp(appurl);
+    const AppOption = resultApp?.data?.result?.result
+      ? resultApp?.data?.result?.result.map((item: AppItem) => ({
+          label: item.app_name,
+          value: item._id,
+        }))
+      : [];
+    setAppList(AppOption);
+  };
+  const fetchTemplateList = async () => {
     try {
       // Handle other data values as needed
       const getData =
@@ -74,7 +92,11 @@ const TemplateListForm = () => {
         "&&sortField=" +
         sortField +
         "&&sortOrder=" +
-        sortOrder;
+        sortOrder +
+        "&&searchApp=" +
+        searchApp +
+        "&&searchApproved=" +
+        searchApproved;
       UseGetTemplate(getData)
         .then((result) => {
           setTemplateList(result.data.data.result);
@@ -92,7 +114,24 @@ const TemplateListForm = () => {
     } catch (error) {
       console.error("Error fetching data:", error);
     }
-  }, [currentPage, pageSize]);
+  };
+  useEffect(() => {
+    try {
+      // Handle other data values as needed
+      fetchAppData();
+      fetchTemplateList();
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  }, []);
+  useEffect(() => {
+    try {
+      // Handle other data values as needed
+      fetchTemplateList();
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  }, [currentPage, pageSize, searchApp, searchApproved]);
   const columnsName = [
     { label: "Template Name", value: "template_name" },
     { label: "Category Name", value: "category_name" },
@@ -284,6 +323,45 @@ const TemplateListForm = () => {
           <div className="sm:flex sm:items-center sm:justify-between">
             <div className="sm:text-left">
               <h1 className="font-bold text-gray-900 header-font">Template</h1>
+            </div>
+            <div className="mt-4 flex flex-col gap-4 sm:mt-0 sm:flex-row sm:items-start">
+              <select
+                id="app_id"
+                className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                onChange={(e) => {
+                  setSearchApp(e.target.value);
+                }}
+              >
+                <option key={0} value="">
+                  {"Select App"}
+                </option>
+                {appList.map((option: { value: number; label: string }) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="mt-4 flex flex-col gap-4 sm:mt-0 sm:flex-row sm:items-start">
+              <select
+                id="approved_status"
+                className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                onChange={(e) => {
+                  setSearchApproved(e.target.value);
+                  setCurrentPage(1);
+                  setPageSize(10);
+                }}
+              >
+                <option key={0} value="">
+                  {"Select Approved Status"}
+                </option>
+                <option key={"Approved"} value="Approved">
+                  {"Approved"}
+                </option>
+                <option key={"Declined"} value="Declined">
+                  {"Declined"}
+                </option>
+              </select>
             </div>
             <div className="mt-4 flex flex-col gap-4 sm:mt-0 sm:flex-row sm:items-start">
               <Link href={PATH.AddTemplate.path}>

@@ -11,6 +11,8 @@ import { useAdminContext } from "@/context/storeAdmin";
 import Breadcrumbs from "@/components/breadcrumb";
 import Image from "next/image";
 import Spinner from "./spinner";
+import UseGetApp from "@/hooks/UseGetApp";
+import { Input } from "./ui/input";
 interface Tag {
   _id: string;
   username: string;
@@ -22,6 +24,10 @@ interface Tag {
 interface TableColumn {
   label: string;
   name?: string;
+}
+interface AppItem {
+  _id: number;
+  app_name: string;
 }
 const AdminListForm = () => {
   const { admin } = useAdminContext();
@@ -35,30 +41,64 @@ const AdminListForm = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [loader, setloader] = useState(true);
+  const [appList, setAppList] = useState([]);
+  const [searchApp, setSearchApp] = useState("");
+  const [searchName, setSearchName] = useState("");
+  // Handle other data values as needed
+  const fetchData = async () => {
+    const appurl = getEndpointUrl(ENDPOINTS.apps);
+    const resultApp = await UseGetApp(appurl);
+    const AppOption = resultApp?.data?.result?.result
+      ? resultApp?.data?.result?.result.map((item: AppItem) => ({
+          label: item.app_name,
+          value: item._id,
+        }))
+      : [];
+    setAppList(AppOption);
+  };
+  const fetchList = async () => {
+    const getData =
+      "?currentPage=" +
+      currentPage +
+      "&&pageSize=" +
+      pageSize +
+      "&&searchApp=" +
+      searchApp +
+      "&&searchName=" +
+      searchName;
+    const url = getEndpointUrl(ENDPOINTS.users + getData);
+    UseGetUsers(url)
+      .then((result) => {
+        setAdminList(result.data.data.data);
+        setCurrentPage(result.data.data.currentPage);
+        setTotalPages(result.data.data.totalPages);
+        setPageSize(result.data.data.pageSize);
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+        // Handle error state or display an error message
+      })
+      .finally(() => {
+        setloader(false);
+      });
+  };
   useEffect(() => {
     try {
       // Handle other data values as needed
-
-      const getData = "?currentPage=" + currentPage + "&&pageSize=" + pageSize;
-      const url = getEndpointUrl(ENDPOINTS.users + getData);
-      UseGetUsers(url)
-        .then((result) => {
-          setAdminList(result.data.data.data);
-          setCurrentPage(result.data.data.currentPage);
-          setTotalPages(result.data.data.totalPages);
-          setPageSize(result.data.data.pageSize);
-        })
-        .catch((error) => {
-          console.error("Error fetching data:", error);
-          // Handle error state or display an error message
-        })
-        .finally(() => {
-          setloader(false);
-        });
+      fetchData();
+      fetchList();
     } catch (error) {
       console.error("Error fetching data:", error);
     }
-  }, [currentPage, pageSize]);
+  }, []);
+  useEffect(() => {
+    try {
+      // Handle other data values as needed
+      fetchList();
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  }, [searchName, searchApp, currentPage, pageSize]);
   const columnsName = [{ label: "Name", value: "username" }];
 
   const columns = [
@@ -94,7 +134,8 @@ const AdminListForm = () => {
       cell: (row: Tag) =>
         row?.profile_img !== undefined &&
         row?.profile_img !== null &&
-        row?.profile_img !== "" && (
+        row?.profile_img !== "" &&
+        row?.profile_img !== "null" && (
           <Image
             className="text-blue-300 hover:text-red block text-sm"
             src={row?.profile_img || ""}
@@ -164,6 +205,37 @@ const AdminListForm = () => {
           <div className="sm:flex sm:items-center sm:justify-between">
             <div className="sm:text-left">
               <h1 className="font-bold text-gray-900 header-font"> User </h1>
+            </div>
+            <div className="mt-4 flex flex-col gap-4 sm:mt-0 sm:flex-row sm:items-start">
+              <Input
+                id={"name"}
+                placeholder="Name or Email"
+                onChange={(e) => {
+                  setSearchName(e.target.value);
+                  setCurrentPage(1);
+                  setPageSize(10);
+                }}
+              />
+            </div>
+            <div className="mt-4 flex flex-col gap-4 sm:mt-0 sm:flex-row sm:items-start">
+              <select
+                id="app_id"
+                className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                onChange={(e) => {
+                  setSearchApp(e.target.value);
+                  setCurrentPage(1);
+                  setPageSize(10);
+                }}
+              >
+                <option key={0} value="">
+                  {"Select App"}
+                </option>
+                {appList.map((option: { value: number; label: string }) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
             </div>
             <div className="mt-4 flex flex-col gap-4 sm:mt-0 sm:flex-row sm:items-start">
               <Link href={PATH.AdddAdmin.path}>
