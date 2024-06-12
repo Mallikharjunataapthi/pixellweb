@@ -12,6 +12,7 @@ export interface TemplateFormData {
   app_id: string;
   base_image_path: string;
   purchase_url: string;
+  api_to_call: string;
   user_id: string;
   tag_name: { value: string; label: string }[];
   aspect_ratio_x: number;

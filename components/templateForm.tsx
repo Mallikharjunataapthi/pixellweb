@@ -60,6 +60,7 @@ const TemplateForm = (props: { id: number }) => {
   const [app_id, setApp_id] = useState("");
   const [base_image_path, setBase_image_path] = useState("");
   const [purchase_url, setPurchase_url] = useState("");
+  const [api_to_call, setApi_to_call] = useState("");
   const [user_id, setUser_id] = useState("");
   const [userlist, setUserlist] = useState([]);
   const [aspect_ratio_x, setAspect_ratio_x] = useState(3);
@@ -148,6 +149,7 @@ const TemplateForm = (props: { id: number }) => {
           settemplate_desc(templateDetails.data.data.template_desc);
           setBase_image_path(templateDetails.data.data.base_image_path);
           setPurchase_url(templateDetails.data.data.purchase_url);
+          setApi_to_call(templateDetails.data.data.api_to_call);
           setUser_id(templateDetails.data.data.user_id);
           setAspect_ratio_x(templateDetails.data.data.aspect_ratio_x);
           setAspect_ratio_y(templateDetails.data.data.aspect_ratio_y);
@@ -176,6 +178,7 @@ const TemplateForm = (props: { id: number }) => {
             template_desc: templateDetails.data.data.template_desc,
             base_image_path: templateDetails.data.data.base_image_path,
             purchase_url: templateDetails.data.data.purchase_url,
+            api_to_call: templateDetails.data.data.api_to_call,
             tag_name: defaultValueFormatted,
             user_id: templateDetails.data.data.user_id,
             aspect_ratio_x: templateDetails.data.data.aspect_ratio_x,
@@ -221,6 +224,7 @@ const TemplateForm = (props: { id: number }) => {
     formData.append("template_desc", data.template_desc);
     formData.append("base_image_path", data.base_image_path);
     formData.append("purchase_url", data.purchase_url);
+    formData.append("api_to_call", data.api_to_call);
     formData.append("user_id", data.user_id);
     formData.append("aspect_ratio_x", ` ${data.aspect_ratio_x}`);
     formData.append("aspect_ratio_y", ` ${data.aspect_ratio_y}`);
@@ -482,6 +486,11 @@ const TemplateForm = (props: { id: number }) => {
                   register={register("purchase_url", {})}
                   defaultValue={purchase_url || ""}
                   label="Purchase url"
+                />
+                <LabelInput
+                  register={register("api_to_call", {})}
+                  defaultValue={api_to_call || ""}
+                  label="API To Call"
                 />
                 <LabelInput
                   register={register("base_image_path", {})}
