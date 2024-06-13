@@ -438,12 +438,12 @@ const TemplateForm = (props: { id: number }) => {
                   label="Template Name"
                   errorMessage={errors.template_name?.message as string}
                 />
-                <p className="font-bold text-sm">Before Image</p>
+                <p className="font-bold text-sm">Before Image/Video</p>
                 <div>
                   <ImagesUploadPreview
                     id="before_image_url"
-                    buttonLabel="Add Before Image"
-                    removeLabel="Remove Before Image"
+                    buttonLabel="Add Before Image/Video"
+                    removeLabel="Remove Before Image/Video"
                     previewShape="rectangle"
                     defaultValue={before_image_url}
                     isLoading={before_image_loading}
@@ -455,13 +455,13 @@ const TemplateForm = (props: { id: number }) => {
                     {errors.before_image_url?.message as string}
                   </p>
                 </div>
-                <p className="font-bold text-sm">After Image</p>
+                <p className="font-bold text-sm">After Image/Video</p>
                 <div>
                   <ImagesUploadPreview
                     id="after_image_url"
                     previewShape="rectangle"
-                    buttonLabel="Add After Image "
-                    removeLabel="Remove After Image"
+                    buttonLabel="Add After Image/Video "
+                    removeLabel="Remove After Image/Video"
                     defaultValue={after_image_url}
                     isLoading={after_image_loading}
                     register={register}

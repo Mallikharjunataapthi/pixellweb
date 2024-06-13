@@ -1,7 +1,11 @@
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { Button } from "./button";
-import { ALLOWED_IMAGE_TYPES, FILE_SIZE_LIMIT_MB } from "@/constants/imageType";
+import {
+  ALLOWED_IMAGE_TYPES,
+  ALLOWED_VIDEO_TYPES,
+  FILE_SIZE_LIMIT_MB,
+} from "@/constants/imageType";
 
 export interface ImageUploadPreviewProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -51,10 +55,10 @@ const ImagesUploadPreview = React.forwardRef<
 
       if (!fileList) return;
 
-      const validImageTypes = ALLOWED_IMAGE_TYPES;
+      const validFileTypes = [...ALLOWED_IMAGE_TYPES, ...ALLOWED_VIDEO_TYPES];
 
       const filteredFiles = Array.from(fileList).filter((file) =>
-        validImageTypes.includes(file.type),
+        validFileTypes.includes(file.type),
       );
 
       if (filteredFiles.length > 0) {
@@ -62,10 +66,56 @@ const ImagesUploadPreview = React.forwardRef<
       }
     };
 
-    const removeImage = () => {
+    const removeFile = () => {
       setFile(null);
       setPreviewUrl("");
       setValue(id, "", { shouldDirty: true });
+    };
+
+    const renderPreview = () => {
+      if (file) {
+        const fileUrl = URL.createObjectURL(file);
+        if (ALLOWED_VIDEO_TYPES.includes(file.type)) {
+          return (
+            <video
+              className="w-full h-full object-cover"
+              controls
+              src={fileUrl}
+            />
+          );
+        } else {
+          return (
+            <Image
+              fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              style={{ objectFit: "cover" }}
+              src={fileUrl}
+              alt={`preview`}
+            />
+          );
+        }
+      } else if (previewUrl) {
+        if (previewUrl.toLowerCase().endsWith(".mp4")) {
+          return (
+            <video
+              className="w-full h-full object-cover"
+              controls
+              src={previewUrl}
+            />
+          );
+        } else {
+          return (
+            <Image
+              fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              style={{ objectFit: "cover" }}
+              src={previewUrl}
+              alt={`preview`}
+            />
+          );
+        }
+      }
+      return null;
     };
 
     return (
@@ -88,8 +138,8 @@ const ImagesUploadPreview = React.forwardRef<
                 {...props}
                 type="file"
                 onChangeCapture={handleFile}
-                accept=".jpg,.jpeg,.png,.gif"
-                className="w-full h-full opacity-0 z-10 absolute curs"
+                accept=".jpg,.jpeg,.png,.gif,.mp4"
+                className="w-full h-full opacity-0 z-10 absolute cursor-pointer"
                 multiple={false}
                 ref={ref}
                 {...register(id, {
@@ -105,7 +155,7 @@ const ImagesUploadPreview = React.forwardRef<
                       }
                       return (
                         ALLOWED_IMAGE_TYPES.includes(files[0]?.type) ||
-                        "Only PNG, JPEG, JPG and GIF"
+                        "Only PNG, JPEG, JPG, GIF and MP4"
                       );
                     },
                     lessThan5MB: (files: File[]) => {
@@ -126,28 +176,16 @@ const ImagesUploadPreview = React.forwardRef<
             <div>
               <div
                 className={`relative w-[8rem] ${
-                  previewShape === "square" ? "h-[8rem]" : "h-[4.5rem]"
+                  previewShape === "square" ? "h-[8rem]" : "h-[12rem]"
                 }`}
               >
-                <Image
-                  fill
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  style={{ objectFit: "cover" }}
-                  src={
-                    file
-                      ? URL.createObjectURL(file)
-                      : previewUrl
-                        ? previewUrl
-                        : ""
-                  }
-                  alt={`preview`}
-                />
+                {renderPreview()}
               </div>
               <Button
                 type="button"
                 className="p-0 hover:bg-transparent border-0 text-sm font-normal hover:underline text-blue-350 mt-6"
                 variant={"outline"}
-                onClick={removeImage}
+                onClick={removeFile}
               >
                 {removeLabel}
               </Button>
