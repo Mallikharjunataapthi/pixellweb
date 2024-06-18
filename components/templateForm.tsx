@@ -2,7 +2,7 @@
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { ENDPOINTS, getEndpointUrl } from "@/constants/endpoints";
 import { TemplateFormData } from "@/types/template-form.type";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { redirect } from "next/navigation";
 import { PATH } from "@/constants/path";
 import LabelInput from "@/components/labelInput";
@@ -65,6 +65,7 @@ const TemplateForm = (props: { id: number }) => {
   const [userlist, setUserlist] = useState([]);
   const [aspect_ratio_x, setAspect_ratio_x] = useState(3);
   const [aspect_ratio_y, setAspect_ratio_y] = useState(4);
+  const isFetching = useRef(false); // Ref to track fetching status
   const {
     register,
     handleSubmit,
@@ -198,6 +199,8 @@ const TemplateForm = (props: { id: number }) => {
     }
   };
   useEffect(() => {
+    if (isFetching.current) return; // If already fetching, exit the function
+    isFetching.current = true;
     fetchData();
   }, []);
   let url;

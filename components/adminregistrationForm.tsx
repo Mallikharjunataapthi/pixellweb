@@ -9,8 +9,9 @@ import { PATH } from "@/constants/path";
 import { redirect } from "next/navigation";
 import Breadcrumbs from "@/components/breadcrumb";
 import UseGetApp from "@/hooks/UseGetApp";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import UseGetUserById from "@/hooks/UseGetUserById";
+import ImagesUploadPreview from "./ui/imagesUploadPreview";
 interface AppItem {
   _id: number;
   app_name: string;
@@ -34,6 +35,8 @@ const AdminRegistrationForm = (props: { id: number }) => {
   const [is_active, setis_active] = useState("1");
   const [email, setEmail] = useState("");
   const [is_FormUpdate, setis_FormUpdate] = useState(false);
+  const isFetching = useRef(false); // Ref to track fetching status
+  const [profile_img, setprofile_img] = useState("");
   const userid = props.id;
   const {
     register,
@@ -62,11 +65,35 @@ const AdminRegistrationForm = (props: { id: number }) => {
   const onSubmit = ((data: AdminRegisterFormData) => {
     if (password == confirm_password) {
       delete data.confirm_password;
-      if (userid != 0 && userid != null && userid != undefined) {
-        updateForm(data);
+      if (data.role_id != "0") {
+        const formData1 = new FormData();
+        formData1.append("username", data.username.toString());
+        formData1.append("role_id", data.role_id.toString());
+        formData1.append("email", data.email.toString());
+        formData1.append("app_id", data.app_id.toString());
+        formData1.append("password", data.password.toString());
+        if (
+          data.profile_img?.length != undefined &&
+          data.profile_img?.length > 0
+        ) {
+          if (data.profile_img) {
+            for (const file of data.profile_img) {
+              formData1.append("profile_img", file);
+            }
+          }
+        }
+        formData1.append("is_active", data.is_active);
+        if (userid != 0 && userid != null && userid != undefined) {
+          updateForm(formData1);
+        } else {
+          submitForm(formData1);
+        }
       } else {
-        data.profile_img = "";
-        submitForm(data);
+        if (userid != 0 && userid != null && userid != undefined) {
+          updateForm(data);
+        } else {
+          submitForm(data);
+        }
       }
     }
   }) as SubmitHandler<FieldValues>;
@@ -109,6 +136,7 @@ const AdminRegistrationForm = (props: { id: number }) => {
           setis_active(userDetails.data.data.is_active);
           setRole_id(userDetails.data.data.role_id);
           setEmail(userDetails.data.data.email);
+          setprofile_img(userDetails?.data?.data?.profile_img);
           setis_FormUpdate(true);
           const initialFormValues: { [key: string]: string } = {
             username: userDetails.data.data.username,
@@ -116,6 +144,7 @@ const AdminRegistrationForm = (props: { id: number }) => {
             app_id: userDetails.data.data.app_id,
             role_id: userDetails.data.data.role_id,
             email: userDetails.data.data.email,
+            profile_img: userDetails?.data?.data?.profile_img.toString(),
           };
           Object.keys(initialFormValues).forEach((key) => {
             register(key); // Register the field if not already registered
@@ -130,6 +159,8 @@ const AdminRegistrationForm = (props: { id: number }) => {
     }
   };
   useEffect(() => {
+    if (isFetching.current) return; // If already fetching, exit the function
+    isFetching.current = true;
     fetchData();
   }, []);
   return (
@@ -252,6 +283,19 @@ const AdminRegistrationForm = (props: { id: number }) => {
                         placeholder="ex:name@company.com"
                       />
                       {errors.email?.message as string}
+                    </div>
+                    <div>
+                      <ImagesUploadPreview
+                        id="profile_img"
+                        buttonLabel="Add User Image"
+                        removeLabel="Remove UserImage"
+                        previewShape="rectangle"
+                        defaultValue={profile_img}
+                        requiredimg={false}
+                        //isLoading={before_image_loading}
+                        register={register}
+                        setValue={setValue}
+                      />
                     </div>
                   </>
                 ) : (

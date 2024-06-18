@@ -15,6 +15,7 @@ import { Button, Modal } from "flowbite-react";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
 import Spinner from "./spinner";
 import UseGetApp from "@/hooks/UseGetApp";
+import { debounce } from "lodash";
 interface Template {
   _id: string;
   template_name: string;
@@ -115,11 +116,14 @@ const TemplateListForm = () => {
       console.error("Error fetching data:", error);
     }
   };
+  const debouncedFetchTemplateList = debounce(fetchTemplateList, 300);
+  const debouncedfetchAppData = debounce(fetchAppData, 300);
+  const debouncedfetchData = debounce(fetchData, 300);
   useEffect(() => {
     try {
       // Handle other data values as needed
-      fetchAppData();
-      fetchTemplateList();
+      debouncedfetchAppData();
+      debouncedFetchTemplateList();
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -127,7 +131,7 @@ const TemplateListForm = () => {
   useEffect(() => {
     try {
       // Handle other data values as needed
-      fetchTemplateList();
+      debouncedFetchTemplateList();
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -244,7 +248,7 @@ const TemplateListForm = () => {
     try {
       // Handle other data values as needed
       await UseActionTemplate(templateactionurl, { template_id: templateId });
-      fetchData();
+      debouncedfetchData();
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -267,7 +271,7 @@ const TemplateListForm = () => {
             setCurrentPage(currentPage - 1);
           }
         }
-        fetchData();
+        debouncedfetchData();
       }
       setTemplateId("");
       setTemplateactionurl("");
@@ -285,8 +289,9 @@ const TemplateListForm = () => {
     // Update the rows per page and current page
     page;
     setPageSize(newPerPage);
-    // fetchData();
+    // debouncedfetchData();
   };
+  const debouncedhandlePageChange = debounce(handlePageChange, 200);
   const CustomPagination = ({
     pages,
     page,
@@ -387,7 +392,7 @@ const TemplateListForm = () => {
                 <CustomPagination
                   pages={totalPages}
                   page={currentPage}
-                  onClick={handlePageChange}
+                  onClick={debouncedhandlePageChange}
                 />
               )}
               paginationComponentOptions={{
@@ -395,7 +400,7 @@ const TemplateListForm = () => {
                 rangeSeparatorText: "out of",
               }}
               paginationTotalRows={templateList.length * totalPages}
-              onChangePage={handlePageChange}
+              onChangePage={debouncedhandlePageChange}
               onChangeRowsPerPage={handleRowsPerPageChange}
               onSort={(column, sortDirection) =>
                 handleSort(column as TableColumn, sortDirection)

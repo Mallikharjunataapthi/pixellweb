@@ -65,7 +65,6 @@ const AdminRegistrationForm = (props: { id: number }) => {
       if (userid != 0 && userid != null && userid != undefined) {
         updateForm(data);
       } else {
-        data.profile_img = "";
         submitForm(data);
       }
     }

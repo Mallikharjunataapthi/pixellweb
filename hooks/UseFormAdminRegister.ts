@@ -8,8 +8,8 @@ interface UseFormAdminSubmitResult<T> {
   isLoading: boolean;
   error: string;
   success: boolean;
-  submitForm: (data: T) => Promise<void>;
-  updateForm: (data: T) => Promise<void>;
+  submitForm: (formData: any) => Promise<void>;
+  updateForm: (formData: any) => Promise<void>;
 }
 const UseFormAdminRegister = <T>({
   url,
@@ -18,12 +18,12 @@ const UseFormAdminRegister = <T>({
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const admintoken = Cookies.get("admintoken");
-  const submitForm = async (data: T): Promise<void> => {
+  const submitForm = async (formData: any): Promise<void> => {
     setIsLoading(true);
     setError("");
 
     try {
-      await axios.post(url, data);
+      await axios.post(url, formData);
       setSuccess(true);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
@@ -44,18 +44,18 @@ const UseFormAdminRegister = <T>({
       setIsLoading(false);
     }
   };
-  const updateForm = async (data: T): Promise<void> => {
+  const updateForm = async (formData: any): Promise<void> => {
     setIsLoading(true);
     setError("");
 
     try {
-      const updateformrslt = await axios.patch(url, data, {
+       await axios.patch(url, formData, {
         headers: {
           Authorization: `Bearer ${admintoken}`,
           // Add any other headers if needed
         },
       });
-      console.log(updateformrslt);
+      
       setSuccess(true);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {

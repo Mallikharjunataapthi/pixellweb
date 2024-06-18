@@ -14,6 +14,7 @@ import { Button, Modal } from "flowbite-react";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
 import Spinner from "./spinner";
 import UseGetApp from "@/hooks/UseGetApp";
+import { debounce } from "lodash";
 interface Category {
   _id: string;
   cat_name: string;
@@ -84,12 +85,14 @@ const CategoryListForm = () => {
       console.error("Error fetching data:", error);
     }
   };
+  const debouncedfetchAppList = debounce(fetchAppList, 300);
+  const debouncedfetchAppData = debounce(fetchdata, 300);
   useEffect(() => {
-    fetchdata();
-    fetchAppList();
+    debouncedfetchAppData();
+    debouncedfetchAppList();
   }, []);
   useEffect(() => {
-    fetchdata();
+    debouncedfetchAppData();
   }, [currentPage, searchApp]);
   const columnsName = [
     { label: "Name", value: "cat_name" },
@@ -169,6 +172,7 @@ const CategoryListForm = () => {
     page;
     setPageSize(newPerPage);
   };
+  const debouncedhandlePageChange = debounce(handlePageChange, 200);
   const CustomPagination = ({
     pages,
     page,
@@ -251,7 +255,7 @@ const CategoryListForm = () => {
                 <CustomPagination
                   pages={totalPages}
                   page={currentPage}
-                  onClick={handlePageChange}
+                  onClick={debouncedhandlePageChange}
                 />
               )}
               paginationComponentOptions={{
@@ -259,7 +263,7 @@ const CategoryListForm = () => {
                 rangeSeparatorText: "out of",
               }}
               paginationTotalRows={categoryList.length * totalPages}
-              onChangePage={handlePageChange}
+              onChangePage={debouncedhandlePageChange}
               onChangeRowsPerPage={handleRowsPerPageChange}
               onSort={(column, sortDirection) =>
                 handleSort(column as TableColumn, sortDirection)

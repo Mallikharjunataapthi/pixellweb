@@ -13,7 +13,10 @@ import Image from "next/image";
 import Spinner from "./spinner";
 import UseGetApp from "@/hooks/UseGetApp";
 import { Input } from "./ui/input";
-interface Tag {
+import { debounce } from "lodash";
+import { Button, Modal } from "flowbite-react";
+import UseDeleteUser from "@/hooks/UseDeleteUser";
+interface UserDetails {
   _id: string;
   username: string;
   role_id: string;
@@ -44,7 +47,8 @@ const AdminListForm = () => {
   const [appList, setAppList] = useState([]);
   const [searchApp, setSearchApp] = useState("");
   const [searchName, setSearchName] = useState("");
-  // Handle other data values as needed
+  const [openModal, setOpenModal] = useState(false);
+  const [deleteUserId, setdeleteUserId] = useState(""); // Handle other data values as needed
   const fetchData = async () => {
     const appurl = getEndpointUrl(ENDPOINTS.apps);
     const resultApp = await UseGetApp(appurl);
@@ -82,11 +86,13 @@ const AdminListForm = () => {
         setloader(false);
       });
   };
+  const debouncedfetchList = debounce(fetchList, 300);
+  const debouncedfetchData = debounce(fetchData, 300);
   useEffect(() => {
     try {
       // Handle other data values as needed
-      fetchData();
-      fetchList();
+      debouncedfetchData();
+      debouncedfetchList();
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -94,7 +100,7 @@ const AdminListForm = () => {
   useEffect(() => {
     try {
       // Handle other data values as needed
-      fetchList();
+      debouncedfetchList();
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -104,15 +110,15 @@ const AdminListForm = () => {
   const columns = [
     {
       name: "App Name",
-      selector: (row: Tag) => row?.app_id?.app_name || "",
+      selector: (row: UserDetails) => row?.app_id?.app_name || "",
 
-      cell: (row: Tag) => row?.app_id?.app_name || "",
+      cell: (row: UserDetails) => row?.app_id?.app_name || "",
       sortable: true,
     },
     {
       name: "Name",
-      selector: (row: Tag) => row?.username || "",
-      cell: (row: Tag) => (
+      selector: (row: UserDetails) => row?.username || "",
+      cell: (row: UserDetails) => (
         <Link
           className="text-blue-300 hover:text-red block text-sm"
           href={"admin-registration/" + row._id}
@@ -124,17 +130,18 @@ const AdminListForm = () => {
     },
     {
       name: "Email",
-      selector: (row: Tag) => row?.email || "",
-      cell: (row: Tag) => row?.email || "",
+      selector: (row: UserDetails) => row?.email || "",
+      cell: (row: UserDetails) => row?.email || "",
       sortable: true,
     },
     {
       name: "Profile Image",
-      selector: (row: Tag) => row?.profile_img || "",
-      cell: (row: Tag) =>
+      selector: (row: UserDetails) => row?.profile_img || "",
+      cell: (row: UserDetails) =>
         row?.profile_img !== undefined &&
         row?.profile_img !== null &&
         row?.profile_img !== "" &&
+        row?.profile_img !== "''" &&
         row?.profile_img !== "null" && (
           <Image
             className="text-blue-300 hover:text-red block text-sm"
@@ -147,14 +154,32 @@ const AdminListForm = () => {
     },
     {
       name: "Role",
-      selector: (row: Tag) => row?.role_id || "",
-      cell: (row: Tag) =>
+      selector: (row: UserDetails) => row?.role_id || "",
+      cell: (row: UserDetails) =>
         row?.role_id == "0"
           ? "Admin"
           : row?.role_id == "2"
             ? "Admin User"
             : "User" || "",
       sortable: true,
+    },
+    {
+      name: "Action",
+      selector: (row: UserDetails) => row?.role_id || "",
+      cell: (row: UserDetails) =>
+        row?.role_id != "0" && (
+          <div>
+            <button
+              className="bg-red-700 rounded-sm text-white py-.8 px-1 text-sm m-1"
+              onClick={() => {
+                setOpenModal(true);
+                setdeleteUserId(row._id);
+              }}
+            >
+              Delete
+            </button>
+          </div>
+        ),
     },
   ];
 
@@ -168,6 +193,7 @@ const AdminListForm = () => {
     page;
     setPageSize(newPerPage);
   };
+  const debouncedhandlePageChange = debounce(handlePageChange, 200);
   const CustomPagination = ({
     pages,
     page,
@@ -185,6 +211,12 @@ const AdminListForm = () => {
     colvalue;
     sortDirection;
   };
+  const handleNameSearch = (value: string) => {
+    setSearchName(value);
+    setCurrentPage(1);
+    setPageSize(10);
+  };
+  const debounceHandleNameSearch = debounce(handleNameSearch, 500);
   const breadcrumbItems = [
     {
       label: PATH.ADMINHOME.name,
@@ -195,6 +227,27 @@ const AdminListForm = () => {
       path: PATH.UsersList.path,
     },
   ];
+  const deleteUser = async () => {
+    try {
+      if (deleteUserId != "") {
+        // Handle other data values as needed
+        await UseDeleteUser(deleteUserId);
+        const updatedItems = adminList.filter(
+          (item: UserDetails) => item._id !== deleteUserId,
+        );
+        setAdminList([...updatedItems]);
+        if (updatedItems.length == 0) {
+          if (currentPage > 1) {
+            setCurrentPage(currentPage - 1);
+          }
+        }
+        fetchList();
+      }
+      setdeleteUserId("");
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
   return (
     <>
       <div className="py-6">
@@ -211,9 +264,7 @@ const AdminListForm = () => {
                 id={"name"}
                 placeholder="Name or Email"
                 onChange={(e) => {
-                  setSearchName(e.target.value);
-                  setCurrentPage(1);
-                  setPageSize(10);
+                  debounceHandleNameSearch(e.target.value);
                 }}
               />
             </div>
@@ -261,7 +312,7 @@ const AdminListForm = () => {
                 <CustomPagination
                   pages={totalPages}
                   page={currentPage}
-                  onClick={handlePageChange}
+                  onClick={debouncedhandlePageChange}
                 />
               )}
               paginationComponentOptions={{
@@ -269,7 +320,7 @@ const AdminListForm = () => {
                 rangeSeparatorText: "out of",
               }}
               paginationTotalRows={adminList.length * totalPages}
-              onChangePage={handlePageChange}
+              onChangePage={debouncedhandlePageChange}
               onChangeRowsPerPage={handleRowsPerPageChange}
               onSort={(column, sortDirection) =>
                 handleSort(column as TableColumn, sortDirection)
@@ -278,6 +329,44 @@ const AdminListForm = () => {
           )}
         </div>
       </div>
+      <Modal
+        show={openModal}
+        size="sm"
+        onClose={() => {
+          setOpenModal(false);
+          setdeleteUserId("");
+        }}
+        popup
+      >
+        <Modal.Header />
+        <Modal.Body>
+          <div className="text-center">
+            <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
+              Are you sure you want to delete this User?
+            </h3>
+            <div className="flex justify-center gap-4">
+              <Button
+                color="failure"
+                onClick={() => {
+                  setOpenModal(false);
+                  deleteUser();
+                }}
+              >
+                {"Yes, I'm sure"}
+              </Button>
+              <Button
+                color="gray"
+                onClick={() => {
+                  setOpenModal(false);
+                  setdeleteUserId("");
+                }}
+              >
+                No, cancel
+              </Button>
+            </div>
+          </div>
+        </Modal.Body>
+      </Modal>
     </>
   );
 };

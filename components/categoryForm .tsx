@@ -2,7 +2,7 @@
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { ENDPOINTS, getEndpointUrl } from "@/constants/endpoints";
 import { CategoryFormData } from "@/types/category-form.type";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import UseGetCategoryById from "@/hooks/UseGetCategoryById";
 import { redirect } from "next/navigation";
 import { PATH } from "@/constants/path";
@@ -31,6 +31,7 @@ const CategoryForm = (props: { id: number }) => {
   const [app_id, setApp_id] = useState("");
   const [image_url, setimage_url] = useState("");
   const [loading, setLoading] = useState(true);
+  const isFetching = useRef(false); // Ref to track fetching status
   const catid = props.id;
 
   const {
@@ -66,7 +67,7 @@ const CategoryForm = (props: { id: number }) => {
             cat_name: categoryDetails.data.data.cat_name,
             is_active: categoryDetails.data.data.is_active,
             app_id: categoryDetails.data.data.app_id,
-            image_url: categoryDetails?.data?.data?.image_url,
+            image_url: categoryDetails?.data?.data?.image_url.toString(),
           };
           Object.keys(initialFormValues).forEach((key) => {
             register(key); // Register the field if not already registered
@@ -81,6 +82,8 @@ const CategoryForm = (props: { id: number }) => {
     setLoading(false);
   };
   useEffect(() => {
+    if (isFetching.current) return; // If already fetching, exit the function
+    isFetching.current = true;
     fetchData();
   }, []);
   let url;

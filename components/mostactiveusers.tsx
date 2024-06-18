@@ -9,6 +9,7 @@ import { redirect } from "next/navigation";
 import { PATH } from "@/constants/path";
 import Breadcrumbs from "@/components/breadcrumb";
 import Spinner from "./spinner";
+import { debounce } from "lodash";
 interface mostactiveusers {
   userName: string;
   appName: string;
@@ -122,6 +123,11 @@ const MostActiveUsersList = () => {
     page;
     setPageSize(newPerPage);
   };
+  const debouncedhandlePageChange = debounce(handlePageChange, 300);
+  const debouncedhandleRowsPerPageChange = debounce(
+    handleRowsPerPageChange,
+    300,
+  );
   const CustomPagination = ({
     pages,
     page,
@@ -177,7 +183,7 @@ const MostActiveUsersList = () => {
                 <CustomPagination
                   pages={totalPages}
                   page={currentPage}
-                  onClick={handlePageChange}
+                  onClick={debouncedhandlePageChange}
                 />
               )}
               paginationComponentOptions={{
@@ -185,8 +191,8 @@ const MostActiveUsersList = () => {
                 rangeSeparatorText: "out of",
               }}
               paginationTotalRows={mostActiveUsersList.length * totalPages}
-              onChangePage={handlePageChange}
-              onChangeRowsPerPage={handleRowsPerPageChange}
+              onChangePage={debouncedhandlePageChange}
+              onChangeRowsPerPage={debouncedhandleRowsPerPageChange}
               onSort={(column, sortDirection) =>
                 handleSort(column as TableColumn, sortDirection)
               }

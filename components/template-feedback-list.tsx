@@ -13,6 +13,7 @@ import { Button, Modal } from "flowbite-react";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
 import Pagination from "./ui/pagenation";
 import Spinner from "./spinner";
+import { debounce } from "lodash";
 interface templatefeedback {
   _id: string;
   template_name: string;
@@ -77,8 +78,9 @@ const TemplateFeedbackListForm = () => {
       console.error("Error fetching data:", error);
     }
   };
+  const debouncedfetchData = debounce(fetchData, 300);
   useEffect(() => {
-    fetchData();
+    debouncedfetchData();
   }, [currentPage]);
   const columnsName = [
     { label: "Template Name", value: "template_name" },
@@ -172,6 +174,11 @@ const TemplateFeedbackListForm = () => {
     page;
     setPageSize(newPerPage);
   };
+  const debouncedhandlePageChange = debounce(handlePageChange, 200);
+  const debouncedhandleRowsPerPageChange = debounce(
+    handleRowsPerPageChange,
+    200,
+  );
   const CustomPagination = ({
     pages,
     page,
@@ -226,7 +233,7 @@ const TemplateFeedbackListForm = () => {
                 <CustomPagination
                   pages={totalPages}
                   page={currentPage}
-                  onClick={handlePageChange}
+                  onClick={debouncedhandlePageChange}
                 />
               )}
               paginationComponentOptions={{
@@ -234,8 +241,8 @@ const TemplateFeedbackListForm = () => {
                 rangeSeparatorText: "out of",
               }}
               paginationTotalRows={templateList.length * totalPages}
-              onChangePage={handlePageChange}
-              onChangeRowsPerPage={handleRowsPerPageChange}
+              onChangePage={debouncedhandlePageChange}
+              onChangeRowsPerPage={debouncedhandleRowsPerPageChange}
               onSort={(column, sortDirection) =>
                 handleSort(column as TableColumn, sortDirection)
               }

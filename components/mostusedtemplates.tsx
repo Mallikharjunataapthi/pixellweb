@@ -10,6 +10,7 @@ import { redirect } from "next/navigation";
 import { PATH } from "@/constants/path";
 import Breadcrumbs from "@/components/breadcrumb";
 import Spinner from "./spinner";
+import { debounce } from "lodash";
 interface mostusedtemplate {
   category_name: string;
   cat_id: number;
@@ -157,6 +158,11 @@ const MostUsedTemplatesList = () => {
     setPageSize(newPerPage);
     fetchData();
   };
+  const debouncedhandlePageChange = debounce(handlePageChange, 300);
+  const debouncedhandleRowsPerPageChange = debounce(
+    handleRowsPerPageChange,
+    300,
+  );
   const CustomPagination = ({
     pages,
     page,
@@ -212,7 +218,7 @@ const MostUsedTemplatesList = () => {
                 <CustomPagination
                   pages={totalPages}
                   page={currentPage}
-                  onClick={handlePageChange}
+                  onClick={debouncedhandlePageChange}
                 />
               )}
               paginationComponentOptions={{
@@ -220,8 +226,8 @@ const MostUsedTemplatesList = () => {
                 rangeSeparatorText: "out of",
               }}
               paginationTotalRows={mostActiveUsersList.length * totalPages}
-              onChangePage={handlePageChange}
-              onChangeRowsPerPage={handleRowsPerPageChange}
+              onChangePage={debouncedhandlePageChange}
+              onChangeRowsPerPage={debouncedhandleRowsPerPageChange}
               onSort={(column, sortDirection) =>
                 handleSort(column as TableColumn, sortDirection)
               }

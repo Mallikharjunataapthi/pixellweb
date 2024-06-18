@@ -15,6 +15,7 @@ import { HiOutlineExclamationCircle } from "react-icons/hi";
 import Spinner from "./spinner";
 import { ENDPOINTS, getEndpointUrl } from "@/constants/endpoints";
 import UseGetApp from "@/hooks/UseGetApp";
+import { debounce } from "lodash";
 interface Tag {
   _id: string;
   tag_name: string;
@@ -89,12 +90,14 @@ const TagListForm = () => {
       console.error("Error fetching data:", error);
     }
   };
+  const debouncedfetchAppList = debounce(fetchAppList, 300);
+  const debouncedfetchAppData = debounce(fetchData, 300);
   useEffect(() => {
-    fetchAppList();
-    fetchData();
+    debouncedfetchAppList();
+    debouncedfetchAppData();
   }, []);
   useEffect(() => {
-    fetchData();
+    debouncedfetchAppData();
   }, [currentPage, searchApp]);
   const columnsName = [
     { label: "Name", value: "tag_name" },
@@ -173,6 +176,7 @@ const TagListForm = () => {
     setPageSize(newPerPage);
     fetchData();
   };
+  const debouncedhandlePageChange = debounce(handlePageChange, 200);
   const CustomPagination = ({
     pages,
     page,
@@ -255,7 +259,7 @@ const TagListForm = () => {
                 <CustomPagination
                   pages={totalPages}
                   page={currentPage}
-                  onClick={handlePageChange}
+                  onClick={debouncedhandlePageChange}
                 />
               )}
               paginationComponentOptions={{
@@ -263,7 +267,7 @@ const TagListForm = () => {
                 rangeSeparatorText: "out of",
               }}
               paginationTotalRows={tagList.length * totalPages}
-              onChangePage={handlePageChange}
+              onChangePage={debouncedhandlePageChange}
               onChangeRowsPerPage={handleRowsPerPageChange}
               onSort={(column, sortDirection) =>
                 handleSort(column as TableColumn, sortDirection)

@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import DataTable from "react-data-table-component";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import UseGetApp from "@/hooks/UseGetApp";
 import UseDeleteApp from "@/hooks/UseDeleteApp";
 import { PATH } from "@/constants/path";
@@ -13,6 +13,7 @@ import Breadcrumbs from "@/components/breadcrumb";
 import { Button, Modal } from "flowbite-react";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
 import Spinner from "./spinner";
+import { debounce } from "lodash";
 interface App {
   _id: string;
   app_name: string;
@@ -36,10 +37,12 @@ const AppListForm = () => {
   const [openModal, setOpenModal] = useState(false);
   const [deleteAppId, setdeleteAppId] = useState("");
   const [loader, setloader] = useState(true);
-  useEffect(() => {
+  const isFetching = useRef(false); // Ref to track fetching status
+  const fetchData = async () => {
+    if (isFetching.current) return; // If already fetching, exit the function
+    isFetching.current = true;
     try {
       // Handle other data values as needed
-
       const getData = "?currentPage=" + currentPage + "&&pageSize=" + pageSize;
       const url = getEndpointUrl(ENDPOINTS.apps + getData);
       UseGetApp(url)
@@ -59,6 +62,9 @@ const AppListForm = () => {
     } catch (error) {
       console.error("Error fetching data:", error);
     }
+  };
+  useEffect(() => {
+    fetchData();
   }, [currentPage, pageSize]);
   const columnsName = [
     { label: "Name", value: "app_name" },
@@ -111,6 +117,7 @@ const AppListForm = () => {
   const handlePageChange = (page: number) => {
     // Update the current page
     setCurrentPage(page);
+    isFetching.current = false;
   };
 
   const handleRowsPerPageChange = (newPerPage: number, page: number) => {
@@ -118,6 +125,7 @@ const AppListForm = () => {
     page;
     setPageSize(newPerPage);
   };
+  const debouncedhandlePageChange = debounce(handlePageChange, 200);
   const CustomPagination = ({
     pages,
     page,
@@ -181,7 +189,7 @@ const AppListForm = () => {
                 <CustomPagination
                   pages={totalPages}
                   page={currentPage}
-                  onClick={handlePageChange}
+                  onClick={debouncedhandlePageChange}
                 />
               )}
               paginationComponentOptions={{
@@ -189,7 +197,7 @@ const AppListForm = () => {
                 rangeSeparatorText: "out of",
               }}
               paginationTotalRows={appList?.length * totalPages}
-              onChangePage={handlePageChange}
+              onChangePage={debouncedhandlePageChange}
               onChangeRowsPerPage={handleRowsPerPageChange}
               onSort={(column, sortDirection) =>
                 handleSort(column as TableColumn, sortDirection)

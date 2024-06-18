@@ -2,7 +2,7 @@
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { ENDPOINTS, getEndpointUrl } from "@/constants/endpoints";
 import { TagFormData } from "@/types/tag-form.type";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import UseGetTagById from "@/hooks/UseGetTagById";
 import { redirect } from "next/navigation";
 import { PATH } from "@/constants/path";
@@ -31,6 +31,7 @@ const TagForm = (props: { id: number }) => {
   const [appList, setAppList] = useState([]);
   const [app_id, setApp_id] = useState("");
   const [loading, setLoading] = useState(true);
+  const isFetching = useRef(false); // Ref to track fetching status
   const tagid = props.id;
 
   const {
@@ -76,6 +77,8 @@ const TagForm = (props: { id: number }) => {
     }
   };
   useEffect(() => {
+    if (isFetching.current) return; // If already fetching, exit the function
+    isFetching.current = true;
     fetchData();
   }, []);
   let url;
