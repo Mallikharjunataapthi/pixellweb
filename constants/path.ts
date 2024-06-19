@@ -52,6 +52,10 @@ export const PATH = {
     path: "/admin/most-used-templates",
     name: "Most Used Templates",
   },
+  UserContactForm: {
+    path: "/admin/contact-from",
+    name: "App User Contact Details",
+  },
   ADMINHOME: { path: "/admin/users", name: "Home" },
   AdddAdmin: { path: "/admin/admin-registration", name: "Add Admin" },
   App: { path: "/admin/app", name: "App" },

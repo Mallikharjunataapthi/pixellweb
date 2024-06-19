@@ -17,6 +17,7 @@ const AdminSidebar = () => {
       { children: PATH.CategoryList.name, href: PATH.CategoryList.path },
       { children: PATH.TagList.name, href: PATH.TagList.path },
       { children: PATH.TemplateList.name, href: PATH.TemplateList.path },
+      { children: PATH.UserContactForm.name, href: PATH.UserContactForm.path },
       {
         children: PATH.TemplateFeedbackList.name,
         href: PATH.TemplateFeedbackList.path,
