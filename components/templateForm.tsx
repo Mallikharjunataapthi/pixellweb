@@ -60,7 +60,7 @@ const TemplateForm = (props: { id: number }) => {
   const [app_id, setApp_id] = useState("");
   const [base_image_path, setBase_image_path] = useState("");
   const [purchase_url, setPurchase_url] = useState("");
-  const [api_to_call, setApi_to_call] = useState("");
+  const [api_to_call, setApi_to_call] = useState("template_creation");
   const [user_id, setUser_id] = useState("");
   const [userlist, setUserlist] = useState([]);
   const [aspect_ratio_x, setAspect_ratio_x] = useState(3);
@@ -194,7 +194,7 @@ const TemplateForm = (props: { id: number }) => {
             template_desc: templateDetails.data.data.template_desc,
             base_image_path: templateDetails.data.data.base_image_path,
             purchase_url: templateDetails.data.data.purchase_url,
-            api_to_call: templateDetails.data.data.api_to_call,
+            api_to_call: templateDetails.data.data.api_to_call.trim(),
             tag_name: defaultValueFormatted,
             user_id: templateDetails.data.data.user_id._id,
             aspect_ratio_x: templateDetails.data.data.aspect_ratio_x,
@@ -290,6 +290,14 @@ const TemplateForm = (props: { id: number }) => {
     { value: "Reward", label: "Reward" },
     // Add more options as needed
   ];
+  const api_to_callOptions = [
+    { value: "ai_avathar_faceswap", label: "ai_avathar_faceswap" },
+    { value: "faceswap_image", label: "faceswap_image" },
+    { value: "faceswap_video", label: "faceswap_video" },
+    { value: "template_creation", label: "template_creation" },
+    // Add more options as needed
+  ];
+
   const breadcrumbItems = [
     {
       label: PATH.ADMINHOME.name,
@@ -505,11 +513,29 @@ const TemplateForm = (props: { id: number }) => {
                   defaultValue={purchase_url || ""}
                   label="Purchase url"
                 />
-                <LabelInput
-                  register={register("api_to_call", {})}
-                  defaultValue={api_to_call || ""}
-                  label="API To Call"
-                />
+                <div>
+                  <label
+                    htmlFor="feedType"
+                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                  >
+                    API To Call
+                  </label>
+                  <select
+                    id="api_to_call"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    {...register("api_to_call", {
+                      required: "This field is required.",
+                    })}
+                    defaultValue={api_to_call}
+                  >
+                    {api_to_callOptions.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                  {errors.api_to_call?.message as string}
+                </div>
                 <LabelInput
                   register={register("base_image_path", {})}
                   defaultValue={base_image_path || ""}
