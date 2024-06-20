@@ -65,6 +65,10 @@ const TemplateForm = (props: { id: number }) => {
   const [userlist, setUserlist] = useState([]);
   const [aspect_ratio_x, setAspect_ratio_x] = useState(3);
   const [aspect_ratio_y, setAspect_ratio_y] = useState(4);
+  const user_name = useRef("");
+  const temp_user_id = useRef("");
+  const user_parent_temp_id = useRef("");
+  const prevapp_id = useRef("");
   const isFetching = useRef(false); // Ref to track fetching status
   const {
     register,
@@ -87,7 +91,12 @@ const TemplateForm = (props: { id: number }) => {
           }))
         : [];
       setUserlist(UserOption);
-
+      if (prevapp_id.current == appid && user_parent_temp_id.current != "") {
+        UserOption.push({
+          label: user_name.current,
+          value: temp_user_id.current,
+        });
+      }
       const Categoryurl =
         getEndpointUrl(ENDPOINTS.category + ENDPOINTS.getActiveList()) +
         "/" +
@@ -137,7 +146,7 @@ const TemplateForm = (props: { id: number }) => {
         ) {
           setis_FormUpdate(true);
           setApp_id(templateDetails.data.data.app_id);
-          await getCatTag(templateDetails.data.data.app_id);
+          prevapp_id.current = templateDetails.data.data.app_id;
           setCat_id(templateDetails.data.data.cat_id);
           setTemplate_name(templateDetails.data.data.template_name);
           setBefore_image_url(templateDetails.data.data.before_image_url);
@@ -151,9 +160,15 @@ const TemplateForm = (props: { id: number }) => {
           setBase_image_path(templateDetails.data.data.base_image_path);
           setPurchase_url(templateDetails.data.data.purchase_url);
           setApi_to_call(templateDetails.data.data.api_to_call);
-          setUser_id(templateDetails.data.data.user_id);
+          setUser_id(templateDetails.data.data.user_id._id);
+          temp_user_id.current = templateDetails.data.data.user_id._id;
+          user_name.current = templateDetails.data.data?.user_id?.username;
+          user_parent_temp_id.current = templateDetails.data.data?.template_id
+            ? templateDetails.data.data?.template_id
+            : "";
           setAspect_ratio_x(templateDetails.data.data.aspect_ratio_x);
           setAspect_ratio_y(templateDetails.data.data.aspect_ratio_y);
+          await getCatTag(templateDetails.data.data.app_id);
           const tagsdefaultValueOptions: string[] = [];
           templateDetails.data.data.tags.forEach((item: string) => {
             tagsdefaultValueOptions.push(item);
@@ -181,7 +196,7 @@ const TemplateForm = (props: { id: number }) => {
             purchase_url: templateDetails.data.data.purchase_url,
             api_to_call: templateDetails.data.data.api_to_call,
             tag_name: defaultValueFormatted,
-            user_id: templateDetails.data.data.user_id,
+            user_id: templateDetails.data.data.user_id._id,
             aspect_ratio_x: templateDetails.data.data.aspect_ratio_x,
             aspect_ratio_y: templateDetails.data.data.aspect_ratio_y,
           };
@@ -228,12 +243,11 @@ const TemplateForm = (props: { id: number }) => {
     formData.append("base_image_path", data.base_image_path);
     formData.append("purchase_url", data.purchase_url);
     formData.append("api_to_call", data.api_to_call);
-    formData.append("user_id", data.user_id);
     formData.append("aspect_ratio_x", ` ${data.aspect_ratio_x}`);
     formData.append("aspect_ratio_y", ` ${data.aspect_ratio_y}`);
-    // if (adminId !== undefined) {
-    //   formData.append("user_id", adminId);
-    // }
+    if (data.user_id) {
+      formData.append("user_id", data.user_id);
+    }
     const outputArray: string[] = data?.tag_name.map((item) => item.value);
     outputArray.forEach((item, index) => {
       formData.append(`tags[${index}]`, item);
@@ -273,6 +287,7 @@ const TemplateForm = (props: { id: number }) => {
   const is_freeOptions = [
     { value: "Pro", label: "Pro" },
     { value: "Free", label: "Free" },
+    { value: "Reward", label: "Reward" },
     // Add more options as needed
   ];
   const breadcrumbItems = [
@@ -362,7 +377,7 @@ const TemplateForm = (props: { id: number }) => {
                     id="user_id"
                     className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     {...register("user_id", {
-                      required: "This field is required.",
+                      required: false,
                     })}
                     defaultValue={user_id}
                   >
