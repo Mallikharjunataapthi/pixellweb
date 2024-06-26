@@ -70,6 +70,13 @@ const TemplateForm = (props: { id: number }) => {
   const user_parent_temp_id = useRef("");
   const prevapp_id = useRef("");
   const isFetching = useRef(false); // Ref to track fetching status
+  const [prompt, setprompt] = useState("");
+  const [style_name, setstyle_name] = useState("none");
+  const [identitynet_strength_ratio, setidentitynet_strength_ratio] =
+    useState(0.7);
+  const [adapter_strength_ratio, setadapter_strength_ratio] = useState(0.8);
+  const [num_steps, setnum_steps] = useState(0);
+  const [seed, setseed] = useState(0);
   const {
     register,
     handleSubmit,
@@ -168,6 +175,16 @@ const TemplateForm = (props: { id: number }) => {
             : "";
           setAspect_ratio_x(templateDetails.data.data.aspect_ratio_x);
           setAspect_ratio_y(templateDetails.data.data.aspect_ratio_y);
+          setprompt(templateDetails.data.data.prompt);
+          setstyle_name(templateDetails.data.data.style_name);
+          setidentitynet_strength_ratio(
+            templateDetails.data.data.identitynet_strength_ratio,
+          );
+          setadapter_strength_ratio(
+            templateDetails.data.data.adapter_strength_ratio,
+          );
+          setnum_steps(templateDetails.data.data.num_steps);
+          setseed(templateDetails.data.data.seed);
           await getCatTag(templateDetails.data.data.app_id);
           const tagsdefaultValueOptions: string[] = [];
           templateDetails.data.data.tags.forEach((item: string) => {
@@ -199,6 +216,14 @@ const TemplateForm = (props: { id: number }) => {
             user_id: templateDetails.data.data.user_id._id,
             aspect_ratio_x: templateDetails.data.data.aspect_ratio_x,
             aspect_ratio_y: templateDetails.data.data.aspect_ratio_y,
+            prompt: templateDetails.data.data.prompt,
+            style_name: templateDetails.data.data.style_name,
+            identitynet_strength_ratio:
+              templateDetails.data.data.identitynet_strength_ratio,
+            adapter_strength_ratio:
+              templateDetails.data.data.adapter_strength_ratio,
+            num_steps: templateDetails.data.data.num_steps,
+            seed: templateDetails.data.data.seed,
           };
           Object.keys(initialFormValues).forEach((key) => {
             register(key); // Register the field if not already registered
@@ -245,6 +270,18 @@ const TemplateForm = (props: { id: number }) => {
     formData.append("api_to_call", data.api_to_call);
     formData.append("aspect_ratio_x", ` ${data.aspect_ratio_x}`);
     formData.append("aspect_ratio_y", ` ${data.aspect_ratio_y}`);
+    formData.append("prompt", ` ${data.prompt}`);
+    formData.append("style_name", ` ${data.style_name}`);
+    formData.append(
+      "identitynet_strength_ratio",
+      ` ${data.identitynet_strength_ratio}`,
+    );
+    formData.append(
+      "adapter_strength_ratio",
+      ` ${data.adapter_strength_ratio}`,
+    );
+    formData.append("num_steps", ` ${data.num_steps}`);
+    formData.append("seed", ` ${data.seed}`);
     if (data.user_id) {
       formData.append("user_id", data.user_id);
     }
@@ -512,6 +549,39 @@ const TemplateForm = (props: { id: number }) => {
                   register={register("purchase_url", {})}
                   defaultValue={purchase_url || ""}
                   label="Purchase url"
+                />
+                <div>
+                  <Label htmlFor={"prompt"}>Prompt</Label>
+                  <Textarea
+                    id={"prompt"}
+                    defaultValue={prompt}
+                    {...register("prompt", {})}
+                  />
+                </div>
+                <LabelInput
+                  register={register("style_name", {})}
+                  defaultValue={style_name}
+                  label="Style Name"
+                />
+                <LabelInput
+                  register={register("identitynet_strength_ratio", {})}
+                  defaultValue={identitynet_strength_ratio}
+                  label="Identitynet Strength Ratio"
+                />
+                <LabelInput
+                  register={register("adapter_strength_ratio", {})}
+                  defaultValue={adapter_strength_ratio}
+                  label="Adapter Strength Ratio"
+                />
+                <LabelInput
+                  register={register("num_steps", {})}
+                  defaultValue={num_steps}
+                  label="num steps"
+                />
+                <LabelInput
+                  register={register("seed", {})}
+                  defaultValue={seed}
+                  label="Seed"
                 />
                 <div>
                   <label

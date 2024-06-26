@@ -17,4 +17,10 @@ export interface TemplateFormData {
   tag_name: { value: string; label: string }[];
   aspect_ratio_x: number;
   aspect_ratio_y: number;
+  prompt: string;
+  style_name: string;
+  identitynet_strength_ratio: number;
+  adapter_strength_ratio: number;
+  num_steps: number;
+  seed: number;
 }

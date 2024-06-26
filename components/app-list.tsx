@@ -18,6 +18,7 @@ interface App {
   _id: string;
   app_name: string;
   is_exist: number;
+  is_auto: string;
 }
 interface TableColumn {
   label: string;
@@ -77,6 +78,12 @@ const AppListForm = () => {
       selector: (row: App) => row?.app_name || "",
 
       cell: (row: App) => row?.app_name || "",
+      sortable: true,
+    },
+    {
+      name: "Auto Approval Status",
+      selector: (row: App) => (row?.is_auto == "1" ? "Enable" : "Disable"),
+      cell: (row: App) => (row?.is_auto == "1" ? "Enable" : "Disable"),
       sortable: true,
     },
     {
