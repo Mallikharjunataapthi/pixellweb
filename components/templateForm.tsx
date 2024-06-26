@@ -328,7 +328,7 @@ const TemplateForm = (props: { id: number }) => {
     // Add more options as needed
   ];
   const api_to_callOptions = [
-    { value: "ai_avathar_faceswap", label: "ai_avathar_faceswap" },
+    { value: "ai_avatar_faceswap", label: "ai_avatar_faceswap" },
     { value: "faceswap_image", label: "faceswap_image" },
     { value: "faceswap_video", label: "faceswap_video" },
     { value: "template_creation", label: "template_creation" },
