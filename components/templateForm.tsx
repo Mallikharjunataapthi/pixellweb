@@ -576,7 +576,7 @@ const TemplateForm = (props: { id: number }) => {
                 <LabelInput
                   register={register("num_steps", {})}
                   defaultValue={num_steps}
-                  label="num steps"
+                  label="Num Steps"
                 />
                 <LabelInput
                   register={register("seed", {})}
