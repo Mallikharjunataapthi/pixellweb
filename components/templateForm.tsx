@@ -360,7 +360,6 @@ const TemplateForm = (props: { id: number }) => {
   if (loading) {
     return <div>Loading...</div>;
   }
-
   return (
     <>
       <div className="py-6">
